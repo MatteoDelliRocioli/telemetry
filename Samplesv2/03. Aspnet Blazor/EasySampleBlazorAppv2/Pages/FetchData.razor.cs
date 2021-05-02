@@ -1,18 +1,19 @@
-﻿using Common;
+﻿#region using
+using Common;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Json;
-using System.Threading.Tasks;
+using System.Threading.Tasks; 
+#endregion
 
 namespace EasySampleBlazorAppv2.Pages
 {
     public partial class FetchData : ComponentBase
     {
-        [Inject]
-        protected ILogger<Counter> _logger { get; set; }
+        [Inject] protected ILogger<FetchData> _logger { get; set; }
 
         private WeatherForecast[] forecasts;
 

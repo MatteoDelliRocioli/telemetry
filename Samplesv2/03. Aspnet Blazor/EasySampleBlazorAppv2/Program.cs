@@ -1,3 +1,4 @@
+#region using
 using Common;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -7,7 +8,8 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading.Tasks; 
+#endregion
 
 namespace EasySampleBlazorAppv2
 {
@@ -22,8 +24,9 @@ namespace EasySampleBlazorAppv2
             var serviceProvider = builder.Services.BuildServiceProvider();
 
             // Gets the standard ILoggerProvider (i.e. the console provider)
-            var consoleProvider = serviceProvider.GetRequiredService<ILoggerProvider>();
-            Console.WriteLine($"loggerProvider: '{consoleProvider}'");
+            //var consoleProvider = serviceProvider.GetRequiredService<ILoggerProvider>();
+            //Console.WriteLine($"loggerProvider: '{consoleProvider}'");
+            var consoleProvider = new TraceLoggerConsoleProvider();
 
             // Creates a Trace logger provider
             var traceLoggerProvider = new TraceLoggerFormatProvider(builder.Configuration) { ConfigurationSuffix = "Console" };

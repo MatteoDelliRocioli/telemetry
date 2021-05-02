@@ -78,6 +78,19 @@ namespace EasySample
                     {
                         loggingBuilder.ClearProviders();
 
+
+                        //var coptions = new ConsoleLoggerOptions();
+                        //coptions.DisableColors = false;
+                        //coptions.Format = ConsoleLoggerFormat.Default;
+                        //coptions.FormatterName = null;
+                        //coptions.LogToStandardErrorThreshold = LogLevel.Trace;
+                        //var configureNamedOptions = new ConfigureNamedOptions<ConsoleLoggerOptions>("", null);
+                        //var optionsFactory = new OptionsFactory<ConsoleLoggerOptions>(new[] { configureNamedOptions }, Enumerable.Empty<IPostConfigureOptions<ConsoleLoggerOptions>>());
+                        //var optionsMonitor = new OptionsMonitor<ConsoleLoggerOptions>(optionsFactory, Enumerable.Empty<IOptionsChangeTokenSource<ConsoleLoggerOptions>>(), new OptionsCache<ConsoleLoggerOptions>());
+                        //var consoleProvider = new ConsoleLoggerProvider(optionsMonitor);
+                        var consoleProvider = new TraceLoggerConsoleProvider();
+                        loggingBuilder.AddDiginsightFormatted(consoleProvider, configuration);
+
                         var options = new Log4NetProviderOptions();
                         options.Log4NetConfigFileName = "log4net.config";
                         var log4NetProvider = new Log4NetProvider(options);

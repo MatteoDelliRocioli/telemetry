@@ -19,7 +19,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 #endregion
 
-// options for final naming:
+// TODO: options for final naming:
 // . Diginsight.System.Diagnostics 
 // . Diginsight.System.Diagnostics.Log4Net 
 // . Diginsight.System.Diagnostics.Serilog
@@ -474,7 +474,7 @@ namespace Common
         {
             var startTicks = TraceLogger.Stopwatch.ElapsedTicks;
             var type = typeof(Application);
-            var caller = CodeSectionScope.Current.Value ;
+            var caller = CodeSectionScope.Current.Value;
             var innerSectionScope = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSectionScope(logger, typeof(T), null, null, null, SourceLevels.Error, LogLevel.Error, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
             var innerCodeSectionLogger = innerSectionScope as ICodeSectionLogger;
             innerCodeSectionLogger.Exception(exception, category, properties, source);
@@ -1069,5 +1069,45 @@ namespace Common
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         int Min(int a, int b) { return a < b ? a : b; }
         #endregion
+    }
+    public class TraceLoggerConsole : ILogger
+    {
+        public IDisposable BeginScope<TState>(TState state)
+        {
+            Console.WriteLine(state);
+            return null;
+        }
+
+        public bool IsEnabled(LogLevel logLevel)
+        {
+            return true;
+        }
+
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
+        {
+            if (formatter == null)
+            {
+                Console.WriteLine(state);
+            }
+            else
+            {
+                var message = formatter(state, exception);
+                Console.Write(message);
+            }
+        }
+    }
+    public class TraceLoggerConsoleProvider : ILoggerProvider
+    {
+        public TraceLoggerConsoleProvider() { }
+
+        public ILogger CreateLogger(string categoryName)
+        {
+            var logger = new TraceLoggerConsole();
+            return logger;
+        }
+        public void Dispose()
+        {
+            ;
+        }
     }
 }
