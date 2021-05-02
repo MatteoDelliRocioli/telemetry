@@ -1,5 +1,6 @@
 ﻿#region using
 using Common;
+using EasySampleBlazorLib;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
@@ -83,7 +84,7 @@ namespace EasySample
 
         private void btnRun_Click(object sender, RoutedEventArgs e)
         {
-            using (var sec = _logger.BeginMethodScope())
+            using (var scope = _logger.BeginMethodScope())
             {
                 try
                 {
@@ -98,12 +99,23 @@ namespace EasySample
                     _logger.LogWarning("this is a Warning trace", "User.Report");
                     _logger.LogError("this is a error trace", "Resource");
 
+                    scope.LogDebug(() => "this is a debug trace", "User"); // , properties: new Dictionary<string, object>() { { "", "" } }
+                    scope.LogInformation(() => "this is a debug trace", "User"); // , properties: new Dictionary<string, object>() { { "", "" } }
+                    scope.LogInformation(() => "this is a Information trace", "Raw");
+                    scope.LogWarning(() => "this is a Warning trace", "User.Report");
+                    scope.LogError(() => "this is a error trace", "Resource");
+
+                    scope.LogError(() => "this is a error trace", "Resource");
+
+                    var sampleClass = new SampleClass();
+                    sampleClass.SampleMethod("dsadsadsa", 1);
+
 
                     throw new NullReferenceException();
                 }
                 catch (Exception ex)
                 {
-                    sec.LogException(ex);
+                    scope.LogException(ex);
                 }
 
                 // report button 

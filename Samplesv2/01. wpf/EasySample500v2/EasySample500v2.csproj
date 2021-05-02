@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
@@ -29,6 +29,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Common.Diagnostics\Common.Diagnostics.csproj" />
+    <ProjectReference Include="..\..\03. Aspnet Blazor\EasySampleBlazorLib\EasySampleBlazorLib.csproj" />
   </ItemGroup>
 
   <ItemGroup>
