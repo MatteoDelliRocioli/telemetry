@@ -1,6 +1,5 @@
 ﻿#region using
 using Common;
-using EasySampleBlazorLib;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
@@ -107,8 +106,8 @@ namespace EasySample
 
                     scope.LogError(() => "this is a error trace", "Resource");
 
-                    var sampleClass = new SampleClass();
-                    sampleClass.SampleMethod("dsadsadsa", 1);
+                    //var sampleClass = new SampleClass();
+                    //sampleClass.SampleMethod("dsadsadsa", 1);
 
 
                     throw new NullReferenceException();

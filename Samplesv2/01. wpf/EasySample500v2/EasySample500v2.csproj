@@ -29,7 +29,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Common.Diagnostics\Common.Diagnostics.csproj" />
-    <ProjectReference Include="..\..\03. Aspnet Blazor\EasySampleBlazorLib\EasySampleBlazorLib.csproj" />
   </ItemGroup>
 
   <ItemGroup>
