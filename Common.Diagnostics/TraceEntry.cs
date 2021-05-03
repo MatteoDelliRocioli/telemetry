@@ -14,6 +14,7 @@ using System.Windows;
 using Microsoft.Extensions.Configuration;
 using System.IO;
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.Logging;
 #endregion
 
 namespace Common
@@ -33,6 +34,7 @@ namespace Common
 
         public TraceEventType TraceEventType { get; set; }
         public SourceLevels SourceLevel { get; set; }
+        public LogLevel LogLevel { get; set; }
 
         public long ElapsedMilliseconds { get; set; }
         public DateTimeOffset Timestamp { get; set; }

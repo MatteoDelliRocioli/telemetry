@@ -81,12 +81,9 @@ namespace Common
         }
         #endregion
         #region Init
-        public static void Init(IConfiguration configuration)
+        public static void InitConfiguration(IConfiguration configuration)
         {
             if (TraceLogger.Configuration != null) { return; }
-            using (new SwitchOnDispose(_lockListenersNotifications, true))
-            using (new SwitchOnDispose(_isInitializing, true))
-            using (new SwitchOnDispose(_isInitializeComplete, false))
             using (var sc = TraceLogger.BeginMethodScope(T))
             {
                 try
@@ -112,9 +109,20 @@ namespace Common
 
             pendingEntriesTemp.ForEach(entry =>
             {
-                //var traceSource = entry.TraceSource;
-                //if (traceSource?.Listeners != null) foreach (TraceListener listener in traceSource.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } }
-                //if (Trace.Listeners != null) { foreach (TraceListener listener in Trace.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
+                var traceSource = entry.TraceSource;
+
+                var t = entry.CodeSectionBase?.T;
+                ILogger logger = null;
+                if (t == null) { return; }
+
+                if (TraceLogger.Host != null)
+                {
+                    Type loggerType = typeof(ILogger<>);
+                    loggerType = loggerType.MakeGenericType(new[] { t });
+                    var host = TraceLogger.Host;
+                    logger = host.Services.GetRequiredService(loggerType) as ILogger;
+                    logger.Log<TraceEntry>(LogLevel.Debug, new EventId(0, entry.RequestContext?.RequestId), entry, entry.Exception, null);
+                }
             });
         }
         #endregion
@@ -177,15 +185,13 @@ namespace Common
                     {
                         if (!TraceLogger._lockListenersNotifications.Value) //  && _logger != null
                         {
-                            IFormatTraceEntry entryFormatter = Provider as IFormatTraceEntry;
-                            listener.Log(logLevel, eventId, entry, exception, entryFormatter != null ? (Func<TraceEntry, Exception, string>)entryFormatter.FormatTraceEntry : null);
-                            //if (state is TraceEntry) { }
-                            //listener.Log(logLevel, eventId, state, exception, formatter);
+                            IFormatTraceEntry iFormatTraceEntry = Provider as IFormatTraceEntry;
+                            listener.Log(logLevel, eventId, entry, exception, iFormatTraceEntry != null ? (Func<TraceEntry, Exception, string>)iFormatTraceEntry.FormatTraceEntry : null);
                         }
                         else
                         {
                             TraceLogger._pendingEntries.Enqueue(entry);
-                            if (TraceLogger._isInitializeComplete.Value == false && TraceLogger._isInitializing.Value == false) { TraceLogger.Init(null); }
+                            // if (TraceLogger._isInitializeComplete.Value == false && TraceLogger._isInitializing.Value == false) { TraceLogger.InitConfiguration(null); }
                         }
                     }
                     catch (Exception ex)
@@ -228,6 +234,40 @@ namespace Common
             }
 
             var sec = new CodeSectionScope(logger, t, null, payload, TraceLogger.TraceSource, sourceLevel, LogLevel.Information, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber);
+            var stopTicks = TraceLogger.Stopwatch.ElapsedTicks;
+            var delta = stopTicks - startTicks;
+            return sec;
+        }
+        public static CodeSectionScope BeginNamedScope<T>(string name = null, object payload = null, SourceLevels sourceLevel = SourceLevels.Verbose, LogLevel logLevel = LogLevel.Trace, string category = null, IDictionary<string, object> properties = null, string source = null, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
+        {
+            var startTicks = TraceLogger.Stopwatch.ElapsedTicks;
+
+            ILogger<T> logger = null;
+            if (logger == null && TraceLogger.Host != null)
+            {
+                var host = TraceLogger.Host;
+                logger = host.Services.GetRequiredService<ILogger<T>>();
+            }
+
+            var sec = new CodeSectionScope(logger, typeof(T), name, payload, TraceLogger.TraceSource, sourceLevel, logLevel, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber);
+            var stopTicks = TraceLogger.Stopwatch.ElapsedTicks;
+            var delta = stopTicks - startTicks;
+            return sec;
+        }
+        public static CodeSectionScope BeginNamedScope(Type t, string name = null, object payload = null, SourceLevels sourceLevel = SourceLevels.Verbose, LogLevel logLevel = LogLevel.Trace, string category = null, IDictionary<string, object> properties = null, string source = null, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
+        {
+            var startTicks = TraceLogger.Stopwatch.ElapsedTicks;
+
+            ILogger logger = null;
+            if (TraceLogger.Host != null)
+            {
+                Type loggerType = typeof(ILogger<>);
+                loggerType = loggerType.MakeGenericType(new[] { t });
+                var host = TraceLogger.Host;
+                logger = host.Services.GetRequiredService(loggerType) as ILogger;
+            }
+
+            var sec = new CodeSectionScope(logger, t, name, payload, TraceLogger.TraceSource, sourceLevel, logLevel, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber);
             var stopTicks = TraceLogger.Stopwatch.ElapsedTicks;
             var delta = stopTicks - startTicks;
             return sec;
@@ -335,7 +375,12 @@ namespace Common
         }
         public static void InitTraceLogger(this IHost Host)
         {
-            TraceLogger.Host = Host;
+            using (new SwitchOnDispose(TraceLogger._lockListenersNotifications, true))
+            using (new SwitchOnDispose(TraceLogger._isInitializing, true))
+            using (new SwitchOnDispose(TraceLogger._isInitializeComplete, false))
+            {
+                TraceLogger.Host = Host;
+            }
             return;
         }
 
@@ -482,7 +527,7 @@ namespace Common
 
         public static ILoggingBuilder AddDiginsightFormatted(this ILoggingBuilder builder, ILoggerProvider logProvider, IConfiguration config = null, string configurationPrefix = null) // , IServiceProvider serviceProvider
         {
-            TraceLogger.Init(config);
+            TraceLogger.InitConfiguration(config);
 
             var traceLoggerFormatProvider = new TraceLoggerFormatProvider() { ConfigurationSuffix = configurationPrefix };
             traceLoggerFormatProvider.AddProvider(logProvider);
@@ -492,7 +537,7 @@ namespace Common
         }
         public static ILoggingBuilder AddDiginsightJson(this ILoggingBuilder builder, ILoggerProvider logProvider, IConfiguration config = null, string configurationPrefix = null) // , IServiceProvider serviceProvider
         {
-            TraceLogger.Init(config);
+            TraceLogger.InitConfiguration(config);
 
             var traceLoggerProvider = new TraceLoggerJsonProvider() { ConfigurationSuffix = configurationPrefix };
             traceLoggerProvider.AddProvider(logProvider);
@@ -523,11 +568,12 @@ namespace Common
         public const string CONFIGSETTING_MAXMESSAGELENWARNING = "MaxMessageLenWarning"; public const int CONFIGDEFAULT_MAXMESSAGELENWARNING = 1024;
         public const string CONFIGSETTING_MAXMESSAGELENERROR = "MaxMessageLenError"; public const int CONFIGDEFAULT_MAXMESSAGELENERROR = -1;
         public const string CONFIGSETTING_PROCESSNAMEPADDING = "ProcessNamePadding"; public const int CONFIGDEFAULT_PROCESSNAMEPADDING = 15;
-        public const string CONFIGSETTING_SOURCEPADDING = "SourcePadding"; public const int CONFIGDEFAULT_SOURCEPADDING = 5;
-        public const string CONFIGSETTING_CATEGORYPADDING = "CategoryPadding"; public const int CONFIGDEFAULT_CATEGORYPADDING = 5;
+        public const string CONFIGSETTING_SOURCEPADDING = "SourcePadding"; public const int CONFIGDEFAULT_SOURCEPADDING = 38;
+        public const string CONFIGSETTING_CATEGORYPADDING = "CategoryPadding"; public const int CONFIGDEFAULT_CATEGORYPADDING = 45;
         public const string CONFIGSETTING_SOURCELEVELPADDING = "SourceLevelPadding"; public const int CONFIGDEFAULT_SOURCELEVELPADDING = 11;
         public const string CONFIGSETTING_DELTAPADDING = "DeltaPadding"; public const int CONFIGDEFAULT_DELTAPADDING = 5;
         public const string CONFIGSETTING_LASTWRITECONTINUATIONENABLED = "LastWriteContinuationEnabled"; public const bool CONFIGDEFAULT_LASTWRITECONTINUATIONENABLED = false;
+        public const string CONFIGSETTING_WRITESTARTUPENTRIES = "WriteStartupEntries"; public const bool CONFIGDEFAULT_WRITESTARTUPENTRIES = true;
 
         public const string CONFIGSETTING_TRACEMESSAGEFORMATPREFIX = "TraceMessageFormatPrefix"; public const string CONFIGDEFAULT_TRACEMESSAGEFORMATPREFIX = "[{now}] {source} {category} {tidpid} - {sourceLevel} - {lastLineDeltaPadded} {deltaPadded} {nesting} {messageNesting}";
         public const string CONFIGSETTING_TRACEMESSAGEFORMAT = "TraceMessageFormat"; public const string CONFIGDEFAULT_TRACEMESSAGEFORMAT = "[{now}] {source} {category} {tidpid} - {sourceLevel} - {lastLineDeltaPadded} {deltaPadded} {nesting} {messageNesting}{message}";
@@ -558,6 +604,7 @@ namespace Common
         public string _traceMessageFormatPrefix, _traceMessageFormat, _traceMessageFormatVerbose, _traceMessageFormatInformation, _traceMessageFormatWarning, _traceMessageFormatError, _traceMessageFormatCritical;
         public string _traceMessageFormatStart, _traceMessageFormatStop, _traceMessageFormatInlineStop, _traceMessageFormatSuspend, _traceMessageFormatResume, _traceMessageFormatTransfer;
         public string _traceDeltaDefault;
+        public bool _writeStartupEntries;
         public TraceEventType _allowedEventTypes = TraceEventType.Critical | TraceEventType.Error | TraceEventType.Warning | TraceEventType.Information | TraceEventType.Verbose | TraceEventType.Start | TraceEventType.Stop | TraceEventType.Suspend | TraceEventType.Resume | TraceEventType.Transfer;
         TraceEntry lastWrite = default(TraceEntry);
         ILoggerProvider _provider;
@@ -569,7 +616,7 @@ namespace Common
         public TraceLoggerFormatProvider() { }
         public TraceLoggerFormatProvider(IConfiguration configuration)
         {
-            TraceLogger.Init(configuration);
+            TraceLogger.InitConfiguration(configuration);
         }
 
         public void AddProvider(ILoggerProvider provider)
@@ -607,6 +654,7 @@ namespace Common
                 _traceMessageFormatSuspend = ConfigurationHelper.GetClassSetting<TraceLoggerFormatProvider, string>(CONFIGSETTING_TRACEMESSAGEFORMATSUSPEND, CONFIGDEFAULT_TRACEMESSAGEFORMATSUSPEND, CultureInfo.InvariantCulture, this.ConfigurationSuffix); if (string.IsNullOrEmpty(_traceMessageFormatSuspend)) { _traceMessageFormatSuspend = _traceMessageFormat; }
                 _traceMessageFormatResume = ConfigurationHelper.GetClassSetting<TraceLoggerFormatProvider, string>(CONFIGSETTING_TRACEMESSAGEFORMATRESUME, CONFIGDEFAULT_TRACEMESSAGEFORMATRESUME, CultureInfo.InvariantCulture, this.ConfigurationSuffix); if (string.IsNullOrEmpty(_traceMessageFormatResume)) { _traceMessageFormatResume = _traceMessageFormat; }
                 _traceMessageFormatTransfer = ConfigurationHelper.GetClassSetting<TraceLoggerFormatProvider, string>(CONFIGSETTING_TRACEMESSAGEFORMATTRANSFER, CONFIGDEFAULT_TRACEMESSAGEFORMATTRANSFER, CultureInfo.InvariantCulture, this.ConfigurationSuffix); if (string.IsNullOrEmpty(_traceMessageFormatTransfer)) { _traceMessageFormatTransfer = _traceMessageFormat; }
+                _writeStartupEntries = ConfigurationHelper.GetClassSetting<TraceLoggerFormatProvider, bool>(CONFIGSETTING_WRITESTARTUPENTRIES, CONFIGDEFAULT_WRITESTARTUPENTRIES, CultureInfo.InvariantCulture, this.ConfigurationSuffix);
 
                 var thicksPerMillisecond = TraceLogger.Stopwatch.ElapsedTicks / TraceLogger.Stopwatch.ElapsedMilliseconds;
                 string fileName = null, workingDirectory = null;
@@ -949,6 +997,7 @@ namespace Common
         public const string CONFIGSETTING_LFREPLACE = "LFReplace"; public const string CONFIGDEFAULT_LFREPLACE = "\\n";
         public const string CONFIGSETTING_TIMESTAMPFORMAT = "TimestampFormat"; public const string CONFIGDEFAULT_TIMESTAMPFORMAT = "HH:mm:ss.fff"; // dd/MM/yyyy 
         public const string CONFIGSETTING_FLUSHONWRITE = "FlushOnWrite"; public const bool CONFIGDEFAULT_FLUSHONWRITE = false;
+        public const string CONFIGSETTING_WRITESTARTUPENTRIES = "WriteStartupEntries"; public const bool CONFIGDEFAULT_WRITESTARTUPENTRIES = true;
         #endregion
         #region internal state
         private static Type T = typeof(TraceLogger);
@@ -962,6 +1011,7 @@ namespace Common
         public string _timestampFormat;
         public bool _showNestedFlow, _showTraceCost, _flushOnWrite;
         public string _traceDeltaDefault;
+        public bool _writeStartupEntries;
         public TraceEventType _allowedEventTypes = TraceEventType.Critical | TraceEventType.Error | TraceEventType.Warning | TraceEventType.Information | TraceEventType.Verbose | TraceEventType.Start | TraceEventType.Stop | TraceEventType.Suspend | TraceEventType.Resume | TraceEventType.Transfer;
         TraceEntry lastWrite = default(TraceEntry);
         ILoggerProvider _provider;
@@ -973,7 +1023,7 @@ namespace Common
         public TraceLoggerJsonProvider() { }
         public TraceLoggerJsonProvider(IConfiguration configuration)
         {
-            TraceLogger.Init(configuration);
+            TraceLogger.InitConfiguration(configuration);
         }
 
         public void AddProvider(ILoggerProvider provider)
@@ -989,6 +1039,8 @@ namespace Common
                 _CRReplace = ConfigurationHelper.GetClassSetting<TraceLoggerJsonProvider, string>(CONFIGSETTING_CRREPLACE, CONFIGDEFAULT_CRREPLACE, CultureInfo.InvariantCulture, this.ConfigurationSuffix);
                 _LFReplace = ConfigurationHelper.GetClassSetting<TraceLoggerJsonProvider, string>(CONFIGSETTING_LFREPLACE, CONFIGDEFAULT_LFREPLACE, CultureInfo.InvariantCulture, this.ConfigurationSuffix);  // ConfigurationHelper.GetSetting<int>(CONFIGSETTING_LFREPLACE, CONFIGDEFAULT_LFREPLACE);
                 _timestampFormat = ConfigurationHelper.GetClassSetting<TraceLoggerJsonProvider, string>(CONFIGSETTING_TIMESTAMPFORMAT, CONFIGDEFAULT_TIMESTAMPFORMAT, CultureInfo.InvariantCulture, this.ConfigurationSuffix);  // ConfigurationHelper.GetSetting<int>(CONFIGSETTING_TIMESTAMPFORMAT, CONFIGDEFAULT_TIMESTAMPFORMAT);
+
+                _writeStartupEntries = ConfigurationHelper.GetClassSetting<TraceLoggerFormatProvider, bool>(CONFIGSETTING_WRITESTARTUPENTRIES, CONFIGDEFAULT_WRITESTARTUPENTRIES, CultureInfo.InvariantCulture, this.ConfigurationSuffix);
 
                 var thicksPerMillisecond = TraceLogger.Stopwatch.ElapsedTicks / TraceLogger.Stopwatch.ElapsedMilliseconds;
                 string fileName = null, workingDirectory = null;

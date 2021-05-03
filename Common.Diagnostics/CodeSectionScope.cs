@@ -111,7 +111,7 @@ namespace Common
             else
             {
                 TraceLogger._pendingEntries.Enqueue(entry);
-                if (TraceLogger._isInitializeComplete.Value == false && TraceLogger._isInitializing.Value == false) { TraceLogger.Init(null); }
+                //if (TraceLogger._isInitializeComplete.Value == false && TraceLogger._isInitializing.Value == false) { TraceLogger.Init(null); }
             }
         }
 
@@ -182,7 +182,7 @@ namespace Common
             else
             {
                 TraceLogger._pendingEntries.Enqueue(entry);
-                if (TraceLogger._isInitializeComplete.Value == false && TraceLogger._isInitializing.Value == false) { TraceLogger.Init(null); }
+                //if (TraceLogger._isInitializeComplete.Value == false && TraceLogger._isInitializing.Value == false) { TraceLogger.Init(null); }
             }
         }
         #endregion
@@ -201,7 +201,7 @@ namespace Common
             else
             {
                 TraceLogger._pendingEntries.Enqueue(entry);
-                if (TraceLogger._isInitializeComplete.Value == false && TraceLogger._isInitializing.Value == false) { TraceLogger.Init(null); }
+                //if (TraceLogger._isInitializeComplete.Value == false && TraceLogger._isInitializing.Value == false) { TraceLogger.Init(null); }
             }
         }
         public void LogDebug(NonFormattableString message, string category = null, IDictionary<string, object> properties = null, string source = null, bool disableCRLFReplace = false)
@@ -216,7 +216,7 @@ namespace Common
             else
             {
                 TraceLogger._pendingEntries.Enqueue(entry);
-                if (TraceLogger._isInitializeComplete.Value == false && TraceLogger._isInitializing.Value == false) { TraceLogger.Init(null); }
+                //if (TraceLogger._isInitializeComplete.Value == false && TraceLogger._isInitializing.Value == false) { TraceLogger.Init(null); }
             }
         }
         public void LogDebug(FormattableString message, string category = null, IDictionary<string, object> properties = null, string source = null, bool disableCRLFReplace = false)
@@ -248,7 +248,7 @@ namespace Common
                 else
                 {
                     TraceLogger._pendingEntries.Enqueue(entry);
-                    if (TraceLogger._isInitializeComplete.Value == false && TraceLogger._isInitializing.Value == false) { TraceLogger.Init(null); }
+                    //if (TraceLogger._isInitializeComplete.Value == false && TraceLogger._isInitializing.Value == false) { TraceLogger.Init(null); }
                 }
             }
             catch (Exception) { }
@@ -267,7 +267,7 @@ namespace Common
                 else
                 {
                     TraceLogger._pendingEntries.Enqueue(entry);
-                    if (TraceLogger._isInitializeComplete.Value == false && TraceLogger._isInitializing.Value == false) { TraceLogger.Init(null); }
+                    //if (TraceLogger._isInitializeComplete.Value == false && TraceLogger._isInitializing.Value == false) { TraceLogger.Init(null); }
                 }
             }
             catch (Exception) { }
@@ -285,7 +285,7 @@ namespace Common
             else
             {
                 TraceLogger._pendingEntries.Enqueue(entry);
-                if (TraceLogger._isInitializeComplete.Value == false && TraceLogger._isInitializing.Value == false) { TraceLogger.Init(null); }
+                //if (TraceLogger._isInitializeComplete.Value == false && TraceLogger._isInitializing.Value == false) { TraceLogger.Init(null); }
             }
         }
         public void LogInformation(FormattableString message, string category = null, IDictionary<string, object> properties = null, string source = null, bool disableCRLFReplace = false)
@@ -300,7 +300,7 @@ namespace Common
             else
             {
                 TraceLogger._pendingEntries.Enqueue(entry);
-                if (TraceLogger._isInitializeComplete.Value == false && TraceLogger._isInitializing.Value == false) { TraceLogger.Init(null); }
+                //if (TraceLogger._isInitializeComplete.Value == false && TraceLogger._isInitializing.Value == false) { TraceLogger.Init(null); }
             }
         }
         public void LogInformation(Func<string> getMessage, string category = null, IDictionary<string, object> properties = null, string source = null, bool disableCRLFReplace = false)
@@ -317,7 +317,7 @@ namespace Common
                 else
                 {
                     TraceLogger._pendingEntries.Enqueue(entry);
-                    if (TraceLogger._isInitializeComplete.Value == false && TraceLogger._isInitializing.Value == false) { TraceLogger.Init(null); }
+                    //if (TraceLogger._isInitializeComplete.Value == false && TraceLogger._isInitializing.Value == false) { TraceLogger.Init(null); }
                 }
             }
             catch (Exception) { }
@@ -335,7 +335,7 @@ namespace Common
             else
             {
                 TraceLogger._pendingEntries.Enqueue(entry);
-                if (TraceLogger._isInitializeComplete.Value == false && TraceLogger._isInitializing.Value == false) { TraceLogger.Init(null); }
+                //if (TraceLogger._isInitializeComplete.Value == false && TraceLogger._isInitializing.Value == false) { TraceLogger.Init(null); }
             }
 
         }
@@ -351,7 +351,7 @@ namespace Common
             else
             {
                 TraceLogger._pendingEntries.Enqueue(entry);
-                if (TraceLogger._isInitializeComplete.Value == false && TraceLogger._isInitializing.Value == false) { TraceLogger.Init(null); }
+                //if (TraceLogger._isInitializeComplete.Value == false && TraceLogger._isInitializing.Value == false) { TraceLogger.Init(null); }
             }
         }
         public void LogWarning(Func<string> getMessage, string category = null, IDictionary<string, object> properties = null, string source = null, bool disableCRLFReplace = false)
@@ -368,7 +368,7 @@ namespace Common
                 else
                 {
                     TraceLogger._pendingEntries.Enqueue(entry);
-                    if (TraceLogger._isInitializeComplete.Value == false && TraceLogger._isInitializing.Value == false) { TraceLogger.Init(null); }
+                    //if (TraceLogger._isInitializeComplete.Value == false && TraceLogger._isInitializing.Value == false) { TraceLogger.Init(null); }
                 }
             }
             catch (Exception) { }
@@ -386,7 +386,7 @@ namespace Common
             else
             {
                 TraceLogger._pendingEntries.Enqueue(entry);
-                if (TraceLogger._isInitializeComplete.Value == false && TraceLogger._isInitializing.Value == false) { TraceLogger.Init(null); }
+                //if (TraceLogger._isInitializeComplete.Value == false && TraceLogger._isInitializing.Value == false) { TraceLogger.Init(null); }
             }
         }
         public void LogError(FormattableString message, string category = null, IDictionary<string, object> properties = null, string source = null, bool disableCRLFReplace = false)
@@ -401,7 +401,7 @@ namespace Common
             else
             {
                 TraceLogger._pendingEntries.Enqueue(entry);
-                if (TraceLogger._isInitializeComplete.Value == false && TraceLogger._isInitializing.Value == false) { TraceLogger.Init(null); }
+                //if (TraceLogger._isInitializeComplete.Value == false && TraceLogger._isInitializing.Value == false) { TraceLogger.Init(null); }
             }
         }
         public void LogError(Func<string> getMessage, string category = null, IDictionary<string, object> properties = null, string source = null, bool disableCRLFReplace = false)
@@ -418,7 +418,7 @@ namespace Common
                 else
                 {
                     TraceLogger._pendingEntries.Enqueue(entry);
-                    if (TraceLogger._isInitializeComplete.Value == false && TraceLogger._isInitializing.Value == false) { TraceLogger.Init(null); }
+                    //if (TraceLogger._isInitializeComplete.Value == false && TraceLogger._isInitializing.Value == false) { TraceLogger.Init(null); }
                 }
             }
             catch (Exception) { }
@@ -453,7 +453,7 @@ namespace Common
             else
             {
                 TraceLogger._pendingEntries.Enqueue(entry);
-                if (TraceLogger._isInitializeComplete.Value == false && TraceLogger._isInitializing.Value == false) { TraceLogger.Init(null); }
+                //if (TraceLogger._isInitializeComplete.Value == false && TraceLogger._isInitializing.Value == false) { TraceLogger.Init(null); }
             }
         }
 
@@ -476,7 +476,7 @@ namespace Common
                 {
                     var entry = new TraceEntry() { TraceEventType = TraceEventType.Stop, TraceSource = this.TraceSource, Message = null, Properties = this.Properties, Source = this.Source, Category = this.Category, SourceLevel = this.SourceLevel, CodeSectionBase = this, Thread = Thread.CurrentThread, ThreadID = Thread.CurrentThread.ManagedThreadId, ApartmentState = Thread.CurrentThread.GetApartmentState(), ElapsedMilliseconds = TraceLogger.Stopwatch.ElapsedMilliseconds, TraceStartTicks = startTicks };
                     TraceLogger._pendingEntries.Enqueue(entry);
-                    if (TraceLogger._isInitializeComplete.Value == false && TraceLogger._isInitializing.Value == false) { TraceLogger.Init(null); }
+                    // if (TraceLogger._isInitializeComplete.Value == false && TraceLogger._isInitializing.Value == false) { TraceLogger.InitConfiguration(null); }
                 }
 
             }
