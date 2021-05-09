@@ -1165,4 +1165,44 @@ namespace Common
             ;
         }
     }
+    public class TraceLoggerDebug : ILogger
+    {
+        public IDisposable BeginScope<TState>(TState state)
+        {
+            Debug.WriteLine(state);
+            return null;
+        }
+
+        public bool IsEnabled(LogLevel logLevel)
+        {
+            return true;
+        }
+
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
+        {
+            if (formatter == null)
+            {
+                Debug.WriteLine(state);
+            }
+            else
+            {
+                var message = formatter(state, exception);
+                Debug.Write(message);
+            }
+        }
+    }
+    public class TraceLoggerDebugProvider : ILoggerProvider
+    {
+        public TraceLoggerDebugProvider() { }
+
+        public ILogger CreateLogger(string categoryName)
+        {
+            var logger = new TraceLoggerDebug();
+            return logger;
+        }
+        public void Dispose()
+        {
+            ;
+        }
+    }
 }
