@@ -420,7 +420,10 @@ namespace Common
             if (sourceLevel != null && sourceLevel.Length < _sourceLevelPadding) { sourceLevel = sourceLevel.PadRight(_sourceLevelPadding); }
             if (sourceLevel.Length > _sourceLevelPadding) { _sourceLevelPadding = sourceLevel.Length; }
 
-            var tidpid = string.Format("{0,5} {1,4} {2}", TraceManager.ProcessId, entry.ThreadID, entry.ApartmentState);
+            //var tidpid = string.Format("{0,5} {1,4} {2}", TraceManager.ProcessId, entry.ThreadID, entry.ApartmentState);
+            var tidpid = TraceLogger.ProcessId > 0 ? $"{TraceLogger.ProcessId,5} {entry.ThreadID,4}" : $"{entry.ThreadID,4}";
+            if (entry.ApartmentState != ApartmentState.Unknown) { tidpid += $" {entry.ApartmentState}"; }
+
             var maxMessageLen = TraceManager.GetMaxMessageLen(codeSection, entry.TraceEventType);
 
             var messageRaw = entry.Message;

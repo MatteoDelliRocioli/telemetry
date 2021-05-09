@@ -508,22 +508,36 @@ namespace Common
 
         private Type GetType<T>(T t) { return typeof(T); }
 
+        [Obsolete("Obsolete method, please, use LogDebug method instead")]
         void ICodeSectionLogger.Debug(object obj, string category, IDictionary<string, object> properties, string source, bool disableCRLFReplace) { this.LogDebug(obj, category, properties, source, disableCRLFReplace); }
+        [Obsolete("Obsolete method, please, use LogDebug method instead")]
         void ICodeSectionLogger.Debug(NonFormattableString message, string category, IDictionary<string, object> properties, string source, bool disableCRLFReplace) { this.LogDebug(message, category, properties, source, disableCRLFReplace); }
+        [Obsolete("Obsolete method, please, use LogDebug method instead")]
         void ICodeSectionLogger.Debug(FormattableString message, string category, IDictionary<string, object> properties, string source, bool disableCRLFReplace) { this.LogDebug(message, category, properties, source, disableCRLFReplace); }
+        [Obsolete("Obsolete method, please, use LogDebug method instead")]
         public void Debug(Func<string> getMessage, string category = null, IDictionary<string, object> properties = null, string source = null, bool disableCRLFReplace = false) { this.LogDebug(getMessage, category, properties, source, disableCRLFReplace); }
+        [Obsolete("Obsolete method, please, use LogInformation method instead")]
         void ICodeSectionLogger.Information(NonFormattableString message, string category, IDictionary<string, object> properties, string source, bool disableCRLFReplace) { this.LogInformation(message, category, properties, source, disableCRLFReplace); }
+        [Obsolete("Obsolete method, please, use LogInformation method instead")]
         void ICodeSectionLogger.Information(FormattableString message, string category, IDictionary<string, object> properties, string source, bool disableCRLFReplace) { this.LogInformation(message, category, properties, source, disableCRLFReplace); }
+        [Obsolete("Obsolete method, please, use LogInformation method instead")]
         void ICodeSectionLogger.Information(Func<string> getMessage, string category, IDictionary<string, object> properties, string source, bool disableCRLFReplace) { this.LogInformation(getMessage, category, properties, source, disableCRLFReplace); }
 
+        [Obsolete("Obsolete method, please, use LogWarning method instead")]
         void ICodeSectionLogger.Warning(NonFormattableString message, string category, IDictionary<string, object> properties, string source, bool disableCRLFReplace) { this.LogWarning(message, category, properties, source, disableCRLFReplace); }
+        [Obsolete("Obsolete method, please, use LogWarning method instead")]
         void ICodeSectionLogger.Warning(FormattableString message, string category, IDictionary<string, object> properties, string source, bool disableCRLFReplace) { this.LogWarning(message, category, properties, source, disableCRLFReplace); }
+        [Obsolete("Obsolete method, please, use LogWarning method instead")]
         void ICodeSectionLogger.Warning(Func<string> getMessage, string category, IDictionary<string, object> properties, string source, bool disableCRLFReplace) { this.LogWarning(getMessage, category, properties, source, disableCRLFReplace); }
 
+        [Obsolete("Obsolete method, please, use LogError method instead")]
         void ICodeSectionLogger.Error(NonFormattableString message, string category, IDictionary<string, object> properties, string source, bool disableCRLFReplace) { this.LogError(message, category, properties, source, disableCRLFReplace); }
+        [Obsolete("Obsolete method, please, use LogError method instead")]
         void ICodeSectionLogger.Error(FormattableString message, string category, IDictionary<string, object> properties, string source, bool disableCRLFReplace) { this.LogError(message, category, properties, source, disableCRLFReplace); }
+        [Obsolete("Obsolete method, please, use LogError method instead")]
         void ICodeSectionLogger.Error(Func<string> getMessage, string category, IDictionary<string, object> properties, string source, bool disableCRLFReplace) { this.LogError(getMessage, category, properties, source, disableCRLFReplace); }
 
+        [Obsolete("Obsolete method, please, use LogException method instead")]
         void ICodeSectionLogger.Exception(Exception exception, string category, IDictionary<string, object> properties, string source, bool disableCRLFReplace) { this.LogException(exception, category, properties, source, disableCRLFReplace); }
     }
 }
