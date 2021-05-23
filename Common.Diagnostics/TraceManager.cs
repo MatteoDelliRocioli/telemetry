@@ -553,6 +553,8 @@ namespace Common
             var jsonFileName = "appsettings";
             var currentDirectory = Directory.GetCurrentDirectory();
             var appdomainFolder = System.AppDomain.CurrentDomain.BaseDirectory.Trim('\\');
+            var assembly = System.Reflection.Assembly.GetEntryAssembly();
+            if (assembly == null) { assembly = System.Reflection.Assembly.GetExecutingAssembly(); }
 
             var environment = System.Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")?.ToLower();
             if (string.IsNullOrEmpty(environment)) { environment = System.Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT")?.ToLower(); }
@@ -565,6 +567,7 @@ namespace Common
             {   // for debug build only check environment setting on appsettings.json
                 builder = new ConfigurationBuilder()
                               .AddJsonFile(jsonFile, true, true)
+                              .AddUserSecrets(assembly)
                               .AddInMemoryCollection();
 
                 builder.AddEnvironmentVariables();
