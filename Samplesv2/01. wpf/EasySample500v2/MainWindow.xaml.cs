@@ -92,19 +92,24 @@ namespace EasySample
                         { "User", 123 },
                         { "Tags", new[] { "sample", "user", "advanced" } }
                     });
-
                     _logger.LogInformation("this is a Information trace", "event");
                     _logger.LogInformation("this is a Information trace", "Raw");
                     _logger.LogWarning("this is a Warning trace", "User.Report");
                     _logger.LogError("this is a error trace", "Resource");
+
+                    TraceLogger.LogDebug(() => "this is a debug trace", "User"); // , properties: new Dictionary<string, object>() { { "", "" } }
+                    TraceLogger.LogInformation(() => "this is a debug trace", "User"); // , properties: new Dictionary<string, object>() { { "", "" } }
+                    TraceLogger.LogInformation(() => "this is a Information trace", "Raw");
+                    TraceLogger.LogWarning(() => "this is a Warning trace", "User.Report");
+                    TraceLogger.LogError(() => "this is a error trace", "Resource");
 
                     scope.LogDebug(() => "this is a debug trace", "User"); // , properties: new Dictionary<string, object>() { { "", "" } }
                     scope.LogInformation(() => "this is a debug trace", "User"); // , properties: new Dictionary<string, object>() { { "", "" } }
                     scope.LogInformation(() => "this is a Information trace", "Raw");
                     scope.LogWarning(() => "this is a Warning trace", "User.Report");
                     scope.LogError(() => "this is a error trace", "Resource");
+                    scope.LogError(() => "this is a error trace", "error");
 
-                    scope.LogError(() => "this is a error trace", "Resource");
 
                     //var sampleClass = new SampleClass();
                     //sampleClass.SampleMethod("dsadsadsa", 1);

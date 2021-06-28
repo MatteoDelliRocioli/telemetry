@@ -150,7 +150,7 @@ namespace Common
             else
             {
                 var startTicks = TraceLogger.Stopwatch.ElapsedTicks;
-                var type = typeof(Application);
+                var type = typeof(InternalClass);
                 var caller = CodeSectionBase.Current.Value;
 
                 var classNameIndex = this.Name.LastIndexOf('.');
@@ -271,6 +271,259 @@ namespace Common
             var stopTicks = TraceLogger.Stopwatch.ElapsedTicks;
             var delta = stopTicks - startTicks;
             return sec;
+        }
+
+        public static void LogDebug(NonFormattableString message, string category = null, IDictionary<string, object> properties = null, string source = null, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
+        {
+            var startTicks = TraceManager.Stopwatch.ElapsedTicks;
+            var type = typeof(InternalClass);
+            var caller = CodeSectionScope.Current.Value;
+
+            ILogger logger = null;
+            if (TraceLogger.Host != null)
+            {
+                Type loggerType = typeof(ILogger<>);
+                loggerType = loggerType.MakeGenericType(new[] { type });
+                var host = TraceLogger.Host;
+                logger = host.Services.GetRequiredService(loggerType) as ILogger;
+            }
+
+            var innerCodeSection = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSectionScope(logger, type, null, null, null, SourceLevels.Verbose, LogLevel.Debug, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
+            
+            var innerCodeSectionLogger = innerCodeSection as ICodeSectionLogger;
+            innerCodeSectionLogger.Debug(message, category, properties, source);
+        }
+        public static void LogDebug(FormattableString message, string category = null, IDictionary<string, object> properties = null, string source = null, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
+        {
+            var startTicks = TraceManager.Stopwatch.ElapsedTicks;
+            var type = typeof(InternalClass);
+            var caller = CodeSectionScope.Current.Value;
+
+            ILogger logger = null;
+            if (TraceLogger.Host != null)
+            {
+                Type loggerType = typeof(ILogger<>);
+                loggerType = loggerType.MakeGenericType(new[] { type });
+                var host = TraceLogger.Host;
+                logger = host.Services.GetRequiredService(loggerType) as ILogger;
+            }
+
+            var innerCodeSection = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSectionScope(logger, type, null, null, null, SourceLevels.Verbose, LogLevel.Debug, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
+            var innerCodeSectionLogger = innerCodeSection as ICodeSectionLogger;
+            innerCodeSectionLogger.Debug(message, category, properties, source);
+        }
+        public static void LogDebug(Func<string> getMessage, string category = null, IDictionary<string, object> properties = null, string source = null, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
+        {
+            var startTicks = TraceManager.Stopwatch.ElapsedTicks;
+            var type = typeof(InternalClass);
+            var caller = CodeSectionScope.Current.Value;
+
+            ILogger logger = null;
+            if (TraceLogger.Host != null)
+            {
+                Type loggerType = typeof(ILogger<>);
+                loggerType = loggerType.MakeGenericType(new[] { type });
+                var host = TraceLogger.Host;
+                logger = host.Services.GetRequiredService(loggerType) as ILogger;
+            }
+
+            var innerCodeSection = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSectionScope(logger, type, null, null, null, SourceLevels.Verbose, LogLevel.Debug, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
+            var innerCodeSectionLogger = innerCodeSection as ICodeSectionLogger;
+            innerCodeSectionLogger.Debug(getMessage, category, properties, source);
+        }
+        public static void LogInformation(NonFormattableString message, string category = null, IDictionary<string, object> properties = null, string source = null, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
+        {
+            var startTicks = TraceManager.Stopwatch.ElapsedTicks;
+            var type = typeof(InternalClass);
+            var caller = CodeSectionScope.Current.Value;
+
+            ILogger logger = null;
+            if (TraceLogger.Host != null)
+            {
+                Type loggerType = typeof(ILogger<>);
+                loggerType = loggerType.MakeGenericType(new[] { type });
+                var host = TraceLogger.Host;
+                logger = host.Services.GetRequiredService(loggerType) as ILogger;
+            }
+
+            var innerCodeSection = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSectionScope(logger, type, null, null, null, SourceLevels.Verbose, LogLevel.Information, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
+
+            var innerCodeSectionLogger = innerCodeSection as ICodeSectionLogger;
+            innerCodeSectionLogger.Information(message, category, properties, source);
+        }
+        public static void LogInformation(FormattableString message, string category = null, IDictionary<string, object> properties = null, string source = null, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
+        {
+            var startTicks = TraceManager.Stopwatch.ElapsedTicks;
+            var type = typeof(InternalClass);
+            var caller = CodeSectionScope.Current.Value;
+
+            ILogger logger = null;
+            if (TraceLogger.Host != null)
+            {
+                Type loggerType = typeof(ILogger<>);
+                loggerType = loggerType.MakeGenericType(new[] { type });
+                var host = TraceLogger.Host;
+                logger = host.Services.GetRequiredService(loggerType) as ILogger;
+            }
+
+            var innerCodeSection = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSectionScope(logger, type, null, null, null, SourceLevels.Verbose, LogLevel.Information, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
+            var innerCodeSectionLogger = innerCodeSection as ICodeSectionLogger;
+            innerCodeSectionLogger.Information(message, category, properties, source);
+        }
+        public static void LogInformation(Func<string> getMessage, string category = null, IDictionary<string, object> properties = null, string source = null, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
+        {
+            var startTicks = TraceManager.Stopwatch.ElapsedTicks;
+            var type = typeof(InternalClass);
+            var caller = CodeSectionScope.Current.Value;
+
+            ILogger logger = null;
+            if (TraceLogger.Host != null)
+            {
+                Type loggerType = typeof(ILogger<>);
+                loggerType = loggerType.MakeGenericType(new[] { type });
+                var host = TraceLogger.Host;
+                logger = host.Services.GetRequiredService(loggerType) as ILogger;
+            }
+
+            var innerCodeSection = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSectionScope(logger, type, null, null, null, SourceLevels.Verbose, LogLevel.Information, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
+            var innerCodeSectionLogger = innerCodeSection as ICodeSectionLogger;
+            innerCodeSectionLogger.Information(getMessage, category, properties, source);
+        }
+        public static void LogWarning(NonFormattableString message, string category = null, IDictionary<string, object> properties = null, string source = null, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
+        {
+            var startTicks = TraceManager.Stopwatch.ElapsedTicks;
+            var type = typeof(InternalClass);
+            var caller = CodeSectionScope.Current.Value;
+
+            ILogger logger = null;
+            if (TraceLogger.Host != null)
+            {
+                Type loggerType = typeof(ILogger<>);
+                loggerType = loggerType.MakeGenericType(new[] { type });
+                var host = TraceLogger.Host;
+                logger = host.Services.GetRequiredService(loggerType) as ILogger;
+            }
+
+            var innerCodeSection = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSectionScope(logger, type, null, null, null, SourceLevels.Verbose, LogLevel.Warning, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
+
+            var innerCodeSectionLogger = innerCodeSection as ICodeSectionLogger;
+            innerCodeSectionLogger.Warning(message, category, properties, source);
+        }
+        public static void LogWarning(FormattableString message, string category = null, IDictionary<string, object> properties = null, string source = null, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
+        {
+            var startTicks = TraceManager.Stopwatch.ElapsedTicks;
+            var type = typeof(InternalClass);
+            var caller = CodeSectionScope.Current.Value;
+
+            ILogger logger = null;
+            if (TraceLogger.Host != null)
+            {
+                Type loggerType = typeof(ILogger<>);
+                loggerType = loggerType.MakeGenericType(new[] { type });
+                var host = TraceLogger.Host;
+                logger = host.Services.GetRequiredService(loggerType) as ILogger;
+            }
+
+            var innerCodeSection = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSectionScope(logger, type, null, null, null, SourceLevels.Verbose, LogLevel.Warning, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
+            var innerCodeSectionLogger = innerCodeSection as ICodeSectionLogger;
+            innerCodeSectionLogger.Warning(message, category, properties, source);
+        }
+        public static void LogWarning(Func<string> getMessage, string category = null, IDictionary<string, object> properties = null, string source = null, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
+        {
+            var startTicks = TraceManager.Stopwatch.ElapsedTicks;
+            var type = typeof(InternalClass);
+            var caller = CodeSectionScope.Current.Value;
+
+            ILogger logger = null;
+            if (TraceLogger.Host != null)
+            {
+                Type loggerType = typeof(ILogger<>);
+                loggerType = loggerType.MakeGenericType(new[] { type });
+                var host = TraceLogger.Host;
+                logger = host.Services.GetRequiredService(loggerType) as ILogger;
+            }
+
+            var innerCodeSection = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSectionScope(logger, type, null, null, null, SourceLevels.Verbose, LogLevel.Warning, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
+            var innerCodeSectionLogger = innerCodeSection as ICodeSectionLogger;
+            innerCodeSectionLogger.Warning(getMessage, category, properties, source);
+        }
+        public static void LogError(NonFormattableString message, string category = null, IDictionary<string, object> properties = null, string source = null, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
+        {
+            var startTicks = TraceManager.Stopwatch.ElapsedTicks;
+            var type = typeof(InternalClass);
+            var caller = CodeSectionScope.Current.Value;
+
+            ILogger logger = null;
+            if (TraceLogger.Host != null)
+            {
+                Type loggerType = typeof(ILogger<>);
+                loggerType = loggerType.MakeGenericType(new[] { type });
+                var host = TraceLogger.Host;
+                logger = host.Services.GetRequiredService(loggerType) as ILogger;
+            }
+
+            var innerCodeSection = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSectionScope(logger, type, null, null, null, SourceLevels.Verbose, LogLevel.Error, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
+
+            var innerCodeSectionLogger = innerCodeSection as ICodeSectionLogger;
+            innerCodeSectionLogger.Error(message, category, properties, source);
+        }
+        public static void LogError(FormattableString message, string category = null, IDictionary<string, object> properties = null, string source = null, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
+        {
+            var startTicks = TraceManager.Stopwatch.ElapsedTicks;
+            var type = typeof(InternalClass);
+            var caller = CodeSectionScope.Current.Value;
+
+            ILogger logger = null;
+            if (TraceLogger.Host != null)
+            {
+                Type loggerType = typeof(ILogger<>);
+                loggerType = loggerType.MakeGenericType(new[] { type });
+                var host = TraceLogger.Host;
+                logger = host.Services.GetRequiredService(loggerType) as ILogger;
+            }
+
+            var innerCodeSection = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSectionScope(logger, type, null, null, null, SourceLevels.Verbose, LogLevel.Error, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
+            var innerCodeSectionLogger = innerCodeSection as ICodeSectionLogger;
+            innerCodeSectionLogger.Error(message, category, properties, source);
+        }
+        public static void LogError(Func<string> getMessage, string category = null, IDictionary<string, object> properties = null, string source = null, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
+        {
+            var startTicks = TraceManager.Stopwatch.ElapsedTicks;
+            var type = typeof(InternalClass);
+            var caller = CodeSectionScope.Current.Value;
+
+            ILogger logger = null;
+            if (TraceLogger.Host != null)
+            {
+                Type loggerType = typeof(ILogger<>);
+                loggerType = loggerType.MakeGenericType(new[] { type });
+                var host = TraceLogger.Host;
+                logger = host.Services.GetRequiredService(loggerType) as ILogger;
+            }
+
+            var innerCodeSection = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSectionScope(logger, type, null, null, null, SourceLevels.Verbose, LogLevel.Error, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
+            var innerCodeSectionLogger = innerCodeSection as ICodeSectionLogger;
+            innerCodeSectionLogger.Error(getMessage, category, properties, source);
+        }
+        public static void LogException(Exception exception, string category = null, IDictionary<string, object> properties = null, string source = null, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
+        {
+            var startTicks = TraceManager.Stopwatch.ElapsedTicks;
+            var type = typeof(InternalClass);
+            var caller = CodeSectionScope.Current.Value;
+
+            ILogger logger = null;
+            if (TraceLogger.Host != null)
+            {
+                Type loggerType = typeof(ILogger<>);
+                loggerType = loggerType.MakeGenericType(new[] { type });
+                var host = TraceLogger.Host;
+                logger = host.Services.GetRequiredService(loggerType) as ILogger;
+            }
+
+            var innerCodeSection = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSectionScope(logger, type, null, null, null, SourceLevels.Verbose, LogLevel.Error, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
+
+            var innerCodeSectionLogger = innerCodeSection as ICodeSectionLogger;
+            innerCodeSectionLogger.Exception(exception, category, properties, source);
         }
 
         public static IConfiguration GetConfiguration()
@@ -401,7 +654,7 @@ namespace Common
         public static void LogDebug<T>(this ILogger<T> logger, object obj, string category = null, IDictionary<string, object> properties = null, string source = null, [CallerMemberName] string membername = "", [CallerFilePath] string sourcefilepath = "", [CallerLineNumber] int sourcelinenumber = 0)
         {
             var startticks = TraceLogger.Stopwatch.ElapsedTicks;
-            var type = typeof(Application);
+            var type = typeof(InternalClass);
             var caller = CodeSectionScope.Current.Value;
             var innerSectionScope = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSectionScope(logger, typeof(T), null, null, null, SourceLevels.Verbose, LogLevel.Debug, category, properties, source, startticks, membername, sourcefilepath, sourcelinenumber, true);
             var innerCodeSectionLogger = innerSectionScope as ICodeSectionLogger;
@@ -410,7 +663,7 @@ namespace Common
         public static void LogDebug<T>(this ILogger<T> logger, NonFormattableString message, string category = null, IDictionary<string, object> properties = null, string source = null, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
         {
             var startTicks = TraceLogger.Stopwatch.ElapsedTicks;
-            var type = typeof(Application);
+            var type = typeof(InternalClass);
             var caller = CodeSectionScope.Current.Value;
             var innerSectionScope = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSectionScope(logger, typeof(T), null, null, null, SourceLevels.Verbose, LogLevel.Debug, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
             var innerCodeSectionLogger = innerSectionScope as ICodeSectionLogger;
@@ -419,7 +672,7 @@ namespace Common
         public static void LogDebug<T>(this ILogger<T> logger, FormattableString message, string category = null, IDictionary<string, object> properties = null, string source = null, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
         {
             var startTicks = TraceLogger.Stopwatch.ElapsedTicks;
-            var type = typeof(Application);
+            var type = typeof(InternalClass);
             var caller = CodeSectionScope.Current.Value;
             var innerSectionScope = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSectionScope(logger, typeof(T), null, null, null, SourceLevels.Verbose, LogLevel.Debug, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
             var innerCodeSectionLogger = innerSectionScope as ICodeSectionLogger;
@@ -428,7 +681,7 @@ namespace Common
         public static void LogDebug<T>(this ILogger<T> logger, Func<string> getMessage, string category = null, IDictionary<string, object> properties = null, string source = null, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
         {
             var startTicks = TraceLogger.Stopwatch.ElapsedTicks;
-            var type = typeof(Application);
+            var type = typeof(InternalClass);
             var caller = CodeSectionScope.Current.Value;
             var innerSectionScope = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSectionScope(logger, typeof(T), null, null, null, SourceLevels.Verbose, LogLevel.Debug, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
             var innerCodeSectionLogger = innerSectionScope as ICodeSectionLogger;
@@ -437,7 +690,7 @@ namespace Common
         public static void LogInformation<T>(this ILogger<T> logger, NonFormattableString message, string category = null, IDictionary<string, object> properties = null, string source = null, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
         {
             var startTicks = TraceLogger.Stopwatch.ElapsedTicks;
-            var type = typeof(Application);
+            var type = typeof(InternalClass);
             var caller = CodeSectionScope.Current.Value;
             var innerSectionScope = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSectionScope(logger, typeof(T), null, null, null, SourceLevels.Information, LogLevel.Information, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
             var innerCodeSectionLogger = innerSectionScope as ICodeSectionLogger;
@@ -446,7 +699,7 @@ namespace Common
         public static void LogInformation<T>(this ILogger<T> logger, FormattableString message, string category = null, IDictionary<string, object> properties = null, string source = null, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
         {
             var startTicks = TraceLogger.Stopwatch.ElapsedTicks;
-            var type = typeof(Application);
+            var type = typeof(InternalClass);
             var caller = CodeSectionScope.Current.Value;
             var innerSectionScope = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSectionScope(logger, typeof(T), null, null, null, SourceLevels.Information, LogLevel.Information, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
             var innerCodeSectionLogger = innerSectionScope as ICodeSectionLogger;
@@ -455,7 +708,7 @@ namespace Common
         public static void LogInformation<T>(this ILogger<T> logger, Func<string> getMessage, string category = null, IDictionary<string, object> properties = null, string source = null, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
         {
             var startTicks = TraceLogger.Stopwatch.ElapsedTicks;
-            var type = typeof(Application);
+            var type = typeof(InternalClass);
             var caller = CodeSectionScope.Current.Value;
             var innerSectionScope = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSectionScope(logger, typeof(T), null, null, null, SourceLevels.Information, LogLevel.Information, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
             var innerCodeSectionLogger = innerSectionScope as ICodeSectionLogger;
@@ -464,7 +717,7 @@ namespace Common
         public static void LogWarning<T>(this ILogger<T> logger, NonFormattableString message, string category = null, IDictionary<string, object> properties = null, string source = null, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
         {
             var startTicks = TraceLogger.Stopwatch.ElapsedTicks;
-            var type = typeof(Application);
+            var type = typeof(InternalClass);
             var caller = CodeSectionScope.Current.Value;
             var innerSectionScope = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSectionScope(logger, typeof(T), null, null, null, SourceLevels.Warning, LogLevel.Warning, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
             var innerCodeSectionLogger = innerSectionScope as ICodeSectionLogger;
@@ -473,7 +726,7 @@ namespace Common
         public static void LogWarning<T>(this ILogger<T> logger, FormattableString message, string category = null, IDictionary<string, object> properties = null, string source = null, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
         {
             var startTicks = TraceLogger.Stopwatch.ElapsedTicks;
-            var type = typeof(Application);
+            var type = typeof(InternalClass);
             var caller = CodeSectionScope.Current.Value;
             var innerSectionScope = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSectionScope(logger, typeof(T), null, null, null, SourceLevels.Warning, LogLevel.Warning, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
             var innerCodeSectionLogger = innerSectionScope as ICodeSectionLogger;
@@ -482,7 +735,7 @@ namespace Common
         public static void LogWarning<T>(this ILogger<T> logger, Func<string> getMessage, string category = null, IDictionary<string, object> properties = null, string source = null, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
         {
             var startTicks = TraceLogger.Stopwatch.ElapsedTicks;
-            var type = typeof(Application);
+            var type = typeof(InternalClass);
             var caller = CodeSectionScope.Current.Value;
             var innerSectionScope = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSectionScope(logger, typeof(T), null, null, null, SourceLevels.Warning, LogLevel.Warning, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
             var innerCodeSectionLogger = innerSectionScope as ICodeSectionLogger;
@@ -491,7 +744,7 @@ namespace Common
         public static void LogError<T>(this ILogger<T> logger, NonFormattableString message, string category = null, IDictionary<string, object> properties = null, string source = null, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
         {
             var startTicks = TraceLogger.Stopwatch.ElapsedTicks;
-            var type = typeof(Application);
+            var type = typeof(InternalClass);
             var caller = CodeSectionScope.Current.Value;
             var innerSectionScope = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSectionScope(logger, typeof(T), null, null, null, SourceLevels.Error, LogLevel.Error, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
             var innerCodeSectionLogger = innerSectionScope as ICodeSectionLogger;
@@ -500,7 +753,7 @@ namespace Common
         public static void LogError<T>(this ILogger<T> logger, FormattableString message, string category = null, IDictionary<string, object> properties = null, string source = null, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
         {
             var startTicks = TraceLogger.Stopwatch.ElapsedTicks;
-            var type = typeof(Application);
+            var type = typeof(InternalClass);
             var caller = CodeSectionScope.Current.Value;
             var innerSectionScope = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSectionScope(logger, typeof(T), null, null, null, SourceLevels.Error, LogLevel.Error, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
             var innerCodeSectionLogger = innerSectionScope as ICodeSectionLogger;
@@ -509,7 +762,7 @@ namespace Common
         public static void LogError<T>(this ILogger<T> logger, Func<string> getMessage, string category = null, IDictionary<string, object> properties = null, string source = null, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
         {
             var startTicks = TraceLogger.Stopwatch.ElapsedTicks;
-            var type = typeof(Application);
+            var type = typeof(InternalClass);
             var caller = CodeSectionScope.Current.Value;
             var innerSectionScope = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSectionScope(logger, typeof(T), null, null, null, SourceLevels.Error, LogLevel.Error, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
             var innerCodeSectionLogger = innerSectionScope as ICodeSectionLogger;
@@ -518,7 +771,7 @@ namespace Common
         public static void LogException<T>(this ILogger<T> logger, Exception exception, string category = null, IDictionary<string, object> properties = null, string source = null, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
         {
             var startTicks = TraceLogger.Stopwatch.ElapsedTicks;
-            var type = typeof(Application);
+            var type = typeof(InternalClass);
             var caller = CodeSectionScope.Current.Value;
             var innerSectionScope = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSectionScope(logger, typeof(T), null, null, null, SourceLevels.Error, LogLevel.Error, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
             var innerCodeSectionLogger = innerSectionScope as ICodeSectionLogger;

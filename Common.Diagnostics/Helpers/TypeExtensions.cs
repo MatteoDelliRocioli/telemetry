@@ -57,5 +57,5 @@ namespace Common
             return returnVal.ToArray();
         }
     }
-    internal class Application { }
+    internal class InternalClass { }
 }
