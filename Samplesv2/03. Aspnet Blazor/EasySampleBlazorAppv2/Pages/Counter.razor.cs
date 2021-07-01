@@ -14,9 +14,10 @@ namespace EasySampleBlazorAppv2.Pages
         [Inject]
         protected ILogger<Counter> _logger { get; set; }
 
+
         private int currentCount = 0;
 
-        private void IncrementCount()
+        private async void IncrementCount()
         {
             using (var scope = _logger.BeginMethodScope())
             {
