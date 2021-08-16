@@ -34,7 +34,7 @@ namespace EasySampleBlazorv2.Server
                               //var tco = Options.Create<TelemetryConfiguration>(telemetryConfiguration);
                               //var aio = Options.Create<ApplicationInsightsLoggerOptions>(appinsightOptions);
                               //loggingBuilder.AddDiginsightJson(new ApplicationInsightsLoggerProvider(tco, aio), context.Configuration);
-                              ////loggingBuilder.AddFilter<ApplicationInsightsLoggerProvider>("", LogLevel.Trace);
+                              ////loggingBuilder.AddFilter<ApplicationInsightsLoggerProvider>("", LogLevel.Debug);
 
                               var debugProvider = new TraceLoggerDebugProvider();
                               var traceLoggerProvider = new TraceLoggerFormatProvider(context.Configuration) { ConfigurationSuffix = "Debug" };
