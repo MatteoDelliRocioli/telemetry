@@ -33,7 +33,7 @@ namespace EasySampleBlazorAppv2.Deploy
                               var aio = Options.Create<ApplicationInsightsLoggerOptions>(appinsightOptions);
                               loggingBuilder.AddDiginsightJson(new ApplicationInsightsLoggerProvider(tco, aio), context.Configuration);
 
-                              loggingBuilder.AddFilter<ApplicationInsightsLoggerProvider>("", LogLevel.Trace);
+                              loggingBuilder.AddFilter<ApplicationInsightsLoggerProvider>("", LogLevel.Debug);
                           });
 
             var host = builder.Build();

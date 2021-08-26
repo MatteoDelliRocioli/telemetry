@@ -95,7 +95,7 @@ namespace EasySample
                             var aio = Options.Create<ApplicationInsightsLoggerOptions>(appinsightOptions);
                             loggingBuilder.AddDiginsightJson(new ApplicationInsightsLoggerProvider(tco, aio), configuration);
 
-                            //loggingBuilder.AddFilter<ApplicationInsightsLoggerProvider>("", LogLevel.Trace);
+                            //loggingBuilder.AddFilter<ApplicationInsightsLoggerProvider>("", LogLevel.Debug);
                         }).Build();
 
                 Host.InitTraceLogger();

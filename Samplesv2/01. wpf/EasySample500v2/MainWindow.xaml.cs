@@ -28,6 +28,7 @@ namespace EasySample
     /// <summary>Interaction logic for MainWindow.xaml</summary>
     public partial class MainWindow : Window
     {
+        static Type T = typeof(MainWindow);
         private static ILogger<MainWindow> _logger;
 
         private string GetScope([CallerMemberName] string memberName = "") { return memberName; }
@@ -110,11 +111,26 @@ namespace EasySample
                     scope.LogError(() => "this is a error trace", "Resource");
                     scope.LogError(() => "this is a error trace", "error");
 
+                    int i = 0;
+                    while (true)
+                    {
+                        using (var scopeLoop = TraceLogger.BeginNamedScope(T, "Loop", null, SourceLevels.Verbose, LogLevel.Debug))
+                        {
+                            i++;
+                            if (i >= 10)
+                            {
+                                break;
+                            }
+                            scopeLoop.LogDebug(new { i });
 
-                    //var sampleClass = new SampleClass();
-                    //sampleClass.SampleMethod("dsadsadsa", 1);
+
+                            //var sampleClass = new SampleClass();
+                            //sampleClass.SampleMethod("dsadsadsa", 1);
 
 
+                        }
+                    }
+                    
                     throw new NullReferenceException();
                 }
                 catch (Exception ex)
