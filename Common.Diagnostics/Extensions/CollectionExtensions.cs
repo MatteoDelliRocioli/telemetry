@@ -9,65 +9,8 @@ using System.Threading.Tasks;
 
 namespace Common
 {
-    #region TraverseOrder
-    internal enum TraverseOrder
-    {
-        InOrder = 0,
-        PreOrder = 1,
-        PostOrder = 2
-    }
-    #endregion
-    #region TraverseOptions
-    internal enum TraverseOptions
-    {
-        All = 0,
-        NodesOnly = 1,
-        LeavesOnly = 2
-    }
-    #endregion
-    internal static class Collections
-    {
-        #region TryGetItem
-        public static T TryGetItem<T>(object[] values, int i)
-        {
-            T ret = values != null && values.Length > i && values[i] is T ? (T)values[i] : default(T);
-            return ret;
-        }
-        #endregion
-
-        #region Clone
-        public static R Clone<R>(IEnumerable list) where R : IList, new()
-        {
-            R newList = new R();
-            if (list != null)
-            {
-                foreach (var item in list)
-                {
-                    newList.Add(item);
-                }
-            }
-            return newList;
-        }
-        #endregion
-        #region Clone
-        public static R Clone<R>(IEnumerable list, bool preserveNull) where R : IList, new()
-        {
-            R retList = default(R);
-            if (list != null)
-            {
-                retList = new R();
-                foreach (var item in list)
-                {
-                    retList.Add(item);
-                }
-            }
-            return retList;
-        }
-        #endregion
-    }
-
     #region class CollectionExtensions
-    internal static class CollectionExtensions
+    internal static class CollectionHelper // Extensions
     {
         #region Traverse
         public static IEnumerable<T> Traverse<T>(this IEnumerable<T> source, Action<T> action) { return Traverse(source, null, action); }

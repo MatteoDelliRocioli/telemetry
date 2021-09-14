@@ -24,8 +24,7 @@ namespace EasySampleBlazorAppv2.Pages
             {
                 Language = "json",
                 GlyphMargin = true,
-                Value = @"
-{
+                Value = @"{
     ""Logging"": {
         ""LogLevel"": {
             ""Default"": ""Information"",
