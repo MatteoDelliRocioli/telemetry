@@ -83,8 +83,18 @@ namespace Common
             pendingEntriesTemp.ForEach(entry =>
             {
                 var traceSource = entry.TraceSource;
-                if (traceSource?.Listeners != null) foreach (TraceListener listener in traceSource.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } }
-                if (Trace.Listeners != null) { foreach (TraceListener listener in Trace.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
+
+                if (traceSource?.Listeners != null)
+                {
+                    var tracesourcelisteners = traceSource?.Listeners?.OfType<TraceListener>()?.ToList();
+                    foreach (TraceListener listener in tracesourcelisteners) { try { listener.WriteLine(entry); } catch (Exception) { } }
+                }
+
+                if (Trace.Listeners != null)
+                {
+                    var traceListeners = Trace.Listeners?.OfType<TraceListener>()?.ToList();
+                    foreach (TraceListener listener in traceListeners) { try { listener.WriteLine(entry); } catch (Exception) { } }
+                }
             });
         }
         public static void Init(SourceLevels filterLevel, IConfiguration configuration)
@@ -253,7 +263,7 @@ namespace Common
         {
             var startTicks = TraceManager.Stopwatch.ElapsedTicks;
             var type = typeof(InternalClass);
-            var caller = CodeSectionBase.Current.Value ;
+            var caller = CodeSectionBase.Current.Value;
             var innerCodeSection = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSection(type, null, null, null, SourceLevels.Warning, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
             var innerCodeSectionLogger = innerCodeSection as ICodeSectionLogger;
             innerCodeSectionLogger.Warning(message, category, properties, source);
