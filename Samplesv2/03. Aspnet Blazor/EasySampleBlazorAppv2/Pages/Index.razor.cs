@@ -25,14 +25,14 @@ namespace EasySampleBlazorAppv2.Pages
                 Language = "json",
                 GlyphMargin = true,
                 Value = @"{
-    ""Logging"": {
-        ""LogLevel"": {
-            ""Default"": ""Information"",
-            ""Microsoft"": ""Warning"",
-            ""Microsoft.Hosting.Lifetime"": ""Information""
-        }
-    }
-}"
+                    ""Logging"": {
+                        ""LogLevel"": {
+                            ""Default"": ""Information"",
+                            ""Microsoft"": ""Warning"",
+                            ""Microsoft.Hosting.Lifetime"": ""Information""
+                        }
+                    }
+                }"
             };
         }
 
@@ -45,16 +45,16 @@ namespace EasySampleBlazorAppv2.Pages
 
             var newDecorations = new ModelDeltaDecoration[]
             {
-            new ModelDeltaDecoration
-            {
-                Range = new BlazorMonaco.Range(3,1,3,1),
-                Options = new ModelDecorationOptions
+                new ModelDeltaDecoration
                 {
-                    IsWholeLine = true,
-                    ClassName = "decorationContentClass",
-                    GlyphMarginClassName = "decorationGlyphMarginClass"
+                    Range = new BlazorMonaco.Range(3,1,3,1),
+                    Options = new ModelDecorationOptions
+                    {
+                        IsWholeLine = true,
+                        ClassName = "decorationContentClass",
+                        GlyphMarginClassName = "decorationGlyphMarginClass"
+                    }
                 }
-            }
             };
 
             decorationIds = await _editor.DeltaDecorations(null, newDecorations);

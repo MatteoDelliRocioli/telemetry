@@ -9,23 +9,7 @@ using System.Threading.Tasks;
 
 namespace Common
 {
-    #region TraverseOrder
-    internal enum TraverseOrder
-    {
-        InOrder = 0,
-        PreOrder = 1,
-        PostOrder = 2
-    }
-    #endregion
-    #region TraverseOptions
-    internal enum TraverseOptions
-    {
-        All = 0,
-        NodesOnly = 1,
-        LeavesOnly = 2
-    }
-    #endregion
-    internal static class Collections // Helper
+    internal static class CollectionHelper 
     {
         #region TryGetItem
         public static T TryGetItem<T>(object[] values, int i)
@@ -79,6 +63,4 @@ namespace Common
         }
         #endregion
     }
-
-
 }

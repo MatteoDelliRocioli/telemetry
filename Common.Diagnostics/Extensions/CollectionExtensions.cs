@@ -9,8 +9,24 @@ using System.Threading.Tasks;
 
 namespace Common
 {
+    #region TraverseOrder
+    internal enum TraverseOrder
+    {
+        InOrder = 0,
+        PreOrder = 1,
+        PostOrder = 2
+    }
+    #endregion
+    #region TraverseOptions
+    internal enum TraverseOptions
+    {
+        All = 0,
+        NodesOnly = 1,
+        LeavesOnly = 2
+    }
+    #endregion
     #region class CollectionExtensions
-    internal static class CollectionHelper // Extensions
+    internal static class CollectionExtensions
     {
         #region Traverse
         public static IEnumerable<T> Traverse<T>(this IEnumerable<T> source, Action<T> action) { return Traverse(source, null, action); }
