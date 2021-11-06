@@ -31,8 +31,7 @@ namespace EasySampleBlazorv2.Client
 
             // replaces the provider with the trace logger provider
             builder.Logging.ClearProviders();
-            builder.Logging.AddProvider(traceLoggerProvider);
-            // i.e. builder.Services.AddSingleton(traceLoggerProvider);
+            builder.Logging.AddProvider(traceLoggerProvider); //i.e. builder.Services.AddSingleton(traceLoggerProvider);
 
             serviceProvider = builder.Services.BuildServiceProvider();
             ILoggerFactory loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();

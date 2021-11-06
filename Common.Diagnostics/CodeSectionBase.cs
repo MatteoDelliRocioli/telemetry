@@ -110,6 +110,7 @@ namespace Common
         public TraceEventType TraceEventType;
         // public IModuleContext ModuleContext { get; set; }
         public SourceLevels SourceLevel { get; set; }
+        public LogLevel LogLevel { get; set; }
         public IDictionary<string, object> Properties { get; set; }
         public string Source { get; set; }
         public string Category { get; set; }

@@ -67,6 +67,7 @@ namespace Common
     public struct TraceEntrySurrogate
     {
         public TraceEventType TraceEventType { get; set; }
+        public LogLevel LogLevel { get; set; }
         public string TraceSourceName { get; set; }
         public string Message { get; set; }
         public IDictionary<string, object> Properties { get; set; }

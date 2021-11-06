@@ -1,3 +1,4 @@
+#region using
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -7,7 +8,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Linq;
-using Common;
+using Common; 
+#endregion
 
 namespace EasySampleBlazorv2.Server
 {
@@ -28,6 +30,7 @@ namespace EasySampleBlazorv2.Server
         public void ConfigureServices(IServiceCollection services)
         {
             using var scope = _logger.BeginMethodScope();
+
             services.AddControllersWithViews();
             services.AddRazorPages();
         }
@@ -36,6 +39,7 @@ namespace EasySampleBlazorv2.Server
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             using var scope = _logger.BeginMethodScope();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

@@ -59,7 +59,7 @@ namespace EasySample
                 await sampleMethod1Async();
 
                 _logger.LogDebug("this is a debug trace"); // , properties: new Dictionary<string, object>() { { "", "" } }
-                _logger.LogInformation(() => "this is a debug trace", "User"); // , properties: new Dictionary<string, object>() { { "", "" } }
+                _logger.LogInformation(() => "this is a Information trace", "User"); // , properties: new Dictionary<string, object>() { { "", "" } }
                 _logger.LogInformation(() => "this is a Information trace", "Raw");
                 _logger.LogWarning(() => "this is a Warning trace", "User.Report");
                 _logger.LogError(() => "this is a error trace", "Resource");
@@ -99,13 +99,13 @@ namespace EasySample
                     _logger.LogError("this is a error trace", "Resource");
 
                     TraceLogger.LogDebug(() => "this is a debug trace", "User"); // , properties: new Dictionary<string, object>() { { "", "" } }
-                    TraceLogger.LogInformation(() => "this is a debug trace", "User"); // , properties: new Dictionary<string, object>() { { "", "" } }
+                    TraceLogger.LogInformation(() => "this is a Information trace", "User"); // , properties: new Dictionary<string, object>() { { "", "" } }
                     TraceLogger.LogInformation(() => "this is a Information trace", "Raw");
                     TraceLogger.LogWarning(() => "this is a Warning trace", "User.Report");
                     TraceLogger.LogError(() => "this is a error trace", "Resource");
 
                     scope.LogDebug(() => "this is a debug trace", "User"); // , properties: new Dictionary<string, object>() { { "", "" } }
-                    scope.LogInformation(() => "this is a debug trace", "User"); // , properties: new Dictionary<string, object>() { { "", "" } }
+                    scope.LogInformation(() => "this is a Information trace", "User"); // , properties: new Dictionary<string, object>() { { "", "" } }
                     scope.LogInformation(() => "this is a Information trace", "Raw");
                     scope.LogWarning(() => "this is a Warning trace", "User.Report");
                     scope.LogError(() => "this is a error trace", "Resource");

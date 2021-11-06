@@ -158,12 +158,15 @@ namespace Common
                 var innerSectionScope = caller = caller != null ? caller.GetInnerSection() : new CodeSectionScope(this, this.Name, null, null, TraceLogger.TraceSource, SourceLevels.Verbose, LogLevel.Debug, this.Name, null, source, startTicks, "Unknown", null, -1, true) { IsInnerScope = true };
 
                 var stateFormatter = formatter != null ? formatter : (s, exc) => { return s.GetLogString(); };
+                var traceEventType = LogLevelHelper.ToTraceEventType(logLevel);
+                var sourceLevel = LogLevelHelper.ToSourceLevel(logLevel);
 
                 entry = new TraceEntry()
                 {
                     GetMessage = () => { return stateFormatter(state, null); },
-                    TraceEventType = TraceEventType.Verbose,
-                    SourceLevel = SourceLevels.Verbose,
+                    TraceEventType = traceEventType,
+                    SourceLevel = sourceLevel,
+                    LogLevel = logLevel,
                     Properties = null,
                     Source = source,
                     Category = this.Name,
@@ -1335,6 +1338,7 @@ namespace Common
             {
                 TraceEventType = entry.TraceEventType,
                 TraceSourceName = entry.TraceSource?.Name,
+                LogLevel = entry.LogLevel,
                 Message = entry.Message,
                 Properties = entry.Properties,
                 Source = entry.Source,
@@ -1364,6 +1368,7 @@ namespace Common
                     TraceSourceName = codeSection.TraceSource?.Name,
                     TraceEventType = codeSection.TraceEventType,
                     SourceLevel = codeSection.SourceLevel,
+                    LogLevel = codeSection.LogLevel,
                     Properties = codeSection.Properties,
                     Source = codeSection.Source,
                     Category = codeSection.Category,
