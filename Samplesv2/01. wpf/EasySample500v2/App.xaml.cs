@@ -80,6 +80,7 @@ namespace EasySample
                         .ConfigureLogging((context, loggingBuilder) =>
                         {
                             loggingBuilder.ClearProviders();
+                            //loggingBuilder.SetMinimumLevel(LogLevel.Trace);
 
                             //var consoleProvider = new TraceLoggerConsoleProvider();
                             //loggingBuilder.AddDiginsightFormatted(consoleProvider, configuration);
@@ -89,11 +90,11 @@ namespace EasySample
                             var log4NetProvider = new Log4NetProvider(options);
                             loggingBuilder.AddDiginsightFormatted(log4NetProvider, configuration);
 
-                            var telemetryConfiguration = new TelemetryConfiguration(appInsightKey);
-                            var appinsightOptions = new ApplicationInsightsLoggerOptions();
-                            var tco = Options.Create<TelemetryConfiguration>(telemetryConfiguration);
-                            var aio = Options.Create<ApplicationInsightsLoggerOptions>(appinsightOptions);
-                            loggingBuilder.AddDiginsightJson(new ApplicationInsightsLoggerProvider(tco, aio), configuration);
+                            //var telemetryConfiguration = new TelemetryConfiguration(appInsightKey);
+                            //var appinsightOptions = new ApplicationInsightsLoggerOptions();
+                            //var tco = Options.Create<TelemetryConfiguration>(telemetryConfiguration);
+                            //var aio = Options.Create<ApplicationInsightsLoggerOptions>(appinsightOptions);
+                            //loggingBuilder.AddDiginsightJson(new ApplicationInsightsLoggerProvider(tco, aio), configuration);
 
                             //loggingBuilder.AddFilter<ApplicationInsightsLoggerProvider>("", LogLevel.Debug);
                         }).Build();
