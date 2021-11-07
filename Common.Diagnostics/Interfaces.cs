@@ -79,6 +79,11 @@ namespace Common
     }
     public interface ICodeSectionLogger
     {
+        void Trace(object obj, string category = null, IDictionary<string, object> properties = null, string source = null, bool disableCRLFReplace = false);
+        void Trace(NonFormattableString message, string category = null, IDictionary<string, object> properties = null, string source = null, bool disableCRLFReplace = false);
+        void Trace(FormattableString message, string category = null, IDictionary<string, object> properties = null, string source = null, bool disableCRLFReplace = false);
+        void Trace(Func<string> getMessage, string category = null, IDictionary<string, object> properties = null, string source = null, bool disableCRLFReplace = false);
+
         void Debug(object obj, string category = null, IDictionary<string, object> properties = null, string source = null, bool disableCRLFReplace = false);
         void Debug(NonFormattableString message, string category = null, IDictionary<string, object> properties = null, string source = null, bool disableCRLFReplace = false);
         void Debug(FormattableString message, string category = null, IDictionary<string, object> properties = null, string source = null, bool disableCRLFReplace = false);

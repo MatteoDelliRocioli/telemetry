@@ -103,9 +103,9 @@ namespace Common
                 // traceSource.TraceData()
                 if (TraceSource?.Listeners != null && TraceSource.Listeners.Count > 0) { foreach (TraceListener listener in TraceSource.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
                 // Trace.WriteLine()
-                if (Trace.Listeners != null && Trace.Listeners.Count > 0)
+                if (System.Diagnostics.Trace.Listeners != null && System.Diagnostics.Trace.Listeners.Count > 0)
                 {
-                    foreach (TraceListener listener in Trace.Listeners)
+                    foreach (TraceListener listener in System.Diagnostics.Trace.Listeners)
                     {
                         try
                         {
@@ -125,6 +125,85 @@ namespace Common
         }
         #endregion
 
+        public void Trace(object obj, string category = null, IDictionary<string, object> properties = null, string source = null, bool disableCRLFReplace = false)
+        {
+            var startTicks = TraceManager.Stopwatch.ElapsedTicks;
+            if (TraceSource?.Switch != null && !TraceSource.Switch.ShouldTrace(TraceEventType.Verbose)) { return; }
+
+            var message = obj.GetLogString();
+
+            var entry = new TraceEntry() { Message = message, TraceEventType = TraceEventType.Verbose, SourceLevel = SourceLevels.Verbose, Properties = properties, Source = source ?? this.Source, Category = category, CodeSection = this, Thread = Thread.CurrentThread, ThreadID = Thread.CurrentThread.ManagedThreadId, ApartmentState = Thread.CurrentThread.GetApartmentState(), DisableCRLFReplace = disableCRLFReplace, ElapsedMilliseconds = TraceManager.Stopwatch.ElapsedMilliseconds, TraceStartTicks = startTicks };
+            if (!TraceManager._lockListenersNotifications.Value)
+            {
+                if (TraceSource?.Listeners != null && TraceSource.Listeners.Count > 0) { foreach (TraceListener listener in TraceSource.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
+                if (System.Diagnostics.Trace.Listeners != null && System.Diagnostics.Trace.Listeners.Count > 0) { foreach (TraceListener listener in System.Diagnostics.Trace.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
+            }
+            else
+            {
+                TraceManager._pendingEntries.Enqueue(entry);
+                if (TraceManager._isInitializeComplete.Value == false && TraceManager._isInitializing.Value == false) { TraceManager.Init(SourceLevels.All, null); }
+            }
+        }
+        public void Trace(NonFormattableString message, string category = null, IDictionary<string, object> properties = null, string source = null, bool disableCRLFReplace = false)
+        {
+            var startTicks = TraceManager.Stopwatch.ElapsedTicks;
+            if (TraceSource?.Switch != null && !TraceSource.Switch.ShouldTrace(TraceEventType.Verbose)) { return; }
+
+            var entry = new TraceEntry() { Message = message.Value, TraceEventType = TraceEventType.Verbose, SourceLevel = SourceLevels.Verbose, Properties = properties, Source = source ?? this.Source, Category = category, CodeSection = this, Thread = Thread.CurrentThread, ThreadID = Thread.CurrentThread.ManagedThreadId, ApartmentState = Thread.CurrentThread.GetApartmentState(), DisableCRLFReplace = disableCRLFReplace, ElapsedMilliseconds = TraceManager.Stopwatch.ElapsedMilliseconds, TraceStartTicks = startTicks };
+            if (!TraceManager._lockListenersNotifications.Value)
+            {
+                if (TraceSource?.Listeners != null && TraceSource.Listeners.Count > 0) { foreach (TraceListener listener in TraceSource.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
+                if (System.Diagnostics.Trace.Listeners != null && System.Diagnostics.Trace.Listeners.Count > 0) { foreach (TraceListener listener in System.Diagnostics.Trace.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
+            }
+            else
+            {
+                TraceManager._pendingEntries.Enqueue(entry);
+                if (TraceManager._isInitializeComplete.Value == false && TraceManager._isInitializing.Value == false) { TraceManager.Init(SourceLevels.All, null); }
+            }
+        }
+        public void Trace(FormattableString message, string category = null, IDictionary<string, object> properties = null, string source = null, bool disableCRLFReplace = false)
+        {
+            var startTicks = TraceManager.Stopwatch.ElapsedTicks;
+            if (TraceSource?.Switch != null && !TraceSource.Switch.ShouldTrace(TraceEventType.Verbose)) { return; }
+
+            try
+            {
+                var entry = new TraceEntry() { Message = string.Format(message.Format, message.GetArguments()), TraceEventType = TraceEventType.Verbose, SourceLevel = SourceLevels.Verbose, Properties = properties, Source = source ?? this.Source, Category = category, CodeSection = this, Thread = Thread.CurrentThread, ThreadID = Thread.CurrentThread.ManagedThreadId, ApartmentState = Thread.CurrentThread.GetApartmentState(), DisableCRLFReplace = disableCRLFReplace, ElapsedMilliseconds = TraceManager.Stopwatch.ElapsedMilliseconds, TraceStartTicks = startTicks };
+                if (!TraceManager._lockListenersNotifications.Value)
+                {
+                    if (TraceSource?.Listeners != null && TraceSource.Listeners.Count > 0) { foreach (TraceListener listener in TraceSource.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
+                    if (System.Diagnostics.Trace.Listeners != null && System.Diagnostics.Trace.Listeners.Count > 0) { foreach (TraceListener listener in System.Diagnostics.Trace.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
+                }
+                else
+                {
+                    TraceManager._pendingEntries.Enqueue(entry);
+                    if (TraceManager._isInitializeComplete.Value == false && TraceManager._isInitializing.Value == false) { TraceManager.Init(SourceLevels.All, null); }
+                }
+            }
+            catch (Exception) { }
+        }
+        public void Trace(Func<string> getMessage, string category = null, IDictionary<string, object> properties = null, string source = null, bool disableCRLFReplace = false)
+        {
+            var startTicks = TraceManager.Stopwatch.ElapsedTicks;
+            if (TraceSource?.Switch != null && !TraceSource.Switch.ShouldTrace(TraceEventType.Verbose)) { return; }
+
+            try
+            {
+                var entry = new TraceEntry() { GetMessage = getMessage, TraceEventType = TraceEventType.Verbose, SourceLevel = SourceLevels.Verbose, Properties = properties, Source = source ?? this.Source, Category = category, CodeSection = this, Thread = Thread.CurrentThread, ThreadID = Thread.CurrentThread.ManagedThreadId, ApartmentState = Thread.CurrentThread.GetApartmentState(), DisableCRLFReplace = disableCRLFReplace, ElapsedMilliseconds = TraceManager.Stopwatch.ElapsedMilliseconds, TraceStartTicks = startTicks };
+                if (!TraceManager._lockListenersNotifications.Value)
+                {
+                    if (TraceSource?.Listeners != null && TraceSource.Listeners.Count > 0) { foreach (TraceListener listener in TraceSource.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
+                    if (System.Diagnostics.Trace.Listeners != null && System.Diagnostics.Trace.Listeners.Count > 0) { foreach (TraceListener listener in System.Diagnostics.Trace.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
+                }
+                else
+                {
+                    TraceManager._pendingEntries.Enqueue(entry);
+                    if (TraceManager._isInitializeComplete.Value == false && TraceManager._isInitializing.Value == false) { TraceManager.Init(SourceLevels.All, null); }
+                }
+            }
+            catch (Exception) { }
+        }
+
         public void Debug(object obj, string category = null, IDictionary<string, object> properties = null, string source = null, bool disableCRLFReplace = false)
         {
             var startTicks = TraceManager.Stopwatch.ElapsedTicks;
@@ -136,7 +215,7 @@ namespace Common
             if (!TraceManager._lockListenersNotifications.Value)
             {
                 if (TraceSource?.Listeners != null && TraceSource.Listeners.Count > 0) { foreach (TraceListener listener in TraceSource.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
-                if (Trace.Listeners != null && Trace.Listeners.Count > 0) { foreach (TraceListener listener in Trace.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
+                if (System.Diagnostics.Trace.Listeners != null && System.Diagnostics.Trace.Listeners.Count > 0) { foreach (TraceListener listener in System.Diagnostics.Trace.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
             }
             else
             {
@@ -153,7 +232,7 @@ namespace Common
             if (!TraceManager._lockListenersNotifications.Value)
             {
                 if (TraceSource?.Listeners != null && TraceSource.Listeners.Count > 0) { foreach (TraceListener listener in TraceSource.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
-                if (Trace.Listeners != null && Trace.Listeners.Count > 0) { foreach (TraceListener listener in Trace.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
+                if (System.Diagnostics.Trace.Listeners != null && System.Diagnostics.Trace.Listeners.Count > 0) { foreach (TraceListener listener in System.Diagnostics.Trace.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
             }
             else
             {
@@ -172,7 +251,7 @@ namespace Common
                 if (!TraceManager._lockListenersNotifications.Value)
                 {
                     if (TraceSource?.Listeners != null && TraceSource.Listeners.Count > 0) { foreach (TraceListener listener in TraceSource.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
-                    if (Trace.Listeners != null && Trace.Listeners.Count > 0) { foreach (TraceListener listener in Trace.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
+                    if (System.Diagnostics.Trace.Listeners != null && System.Diagnostics.Trace.Listeners.Count > 0) { foreach (TraceListener listener in System.Diagnostics.Trace.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
                 }
                 else
                 {
@@ -193,7 +272,7 @@ namespace Common
                 if (!TraceManager._lockListenersNotifications.Value)
                 {
                     if (TraceSource?.Listeners != null && TraceSource.Listeners.Count > 0) { foreach (TraceListener listener in TraceSource.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
-                    if (Trace.Listeners != null && Trace.Listeners.Count > 0) { foreach (TraceListener listener in Trace.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
+                    if (System.Diagnostics.Trace.Listeners != null && System.Diagnostics.Trace.Listeners.Count > 0) { foreach (TraceListener listener in System.Diagnostics.Trace.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
                 }
                 else
                 {
@@ -213,7 +292,7 @@ namespace Common
             if (!TraceManager._lockListenersNotifications.Value)
             {
                 if (TraceSource?.Listeners != null && TraceSource.Listeners.Count > 0) { foreach (TraceListener listener in TraceSource.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
-                if (Trace.Listeners != null && Trace.Listeners.Count > 0) { foreach (TraceListener listener in Trace.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
+                if (System.Diagnostics.Trace.Listeners != null && System.Diagnostics.Trace.Listeners.Count > 0) { foreach (TraceListener listener in System.Diagnostics.Trace.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
             }
             else
             {
@@ -230,7 +309,7 @@ namespace Common
             if (!TraceManager._lockListenersNotifications.Value)
             {
                 if (TraceSource?.Listeners != null && TraceSource.Listeners.Count > 0) { foreach (TraceListener listener in TraceSource.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
-                if (Trace.Listeners != null && Trace.Listeners.Count > 0) { foreach (TraceListener listener in Trace.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
+                if (System.Diagnostics.Trace.Listeners != null && System.Diagnostics.Trace.Listeners.Count > 0) { foreach (TraceListener listener in System.Diagnostics.Trace.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
             }
             else
             {
@@ -247,7 +326,7 @@ namespace Common
             if (!TraceManager._lockListenersNotifications.Value)
             {
                 if (TraceSource?.Listeners != null && TraceSource.Listeners.Count > 0) { foreach (TraceListener listener in TraceSource.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
-                if (Trace.Listeners != null && Trace.Listeners.Count > 0) { foreach (TraceListener listener in Trace.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
+                if (System.Diagnostics.Trace.Listeners != null && System.Diagnostics.Trace.Listeners.Count > 0) { foreach (TraceListener listener in System.Diagnostics.Trace.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
             }
             else
             {
@@ -265,7 +344,7 @@ namespace Common
             if (!TraceManager._lockListenersNotifications.Value)
             {
                 if (TraceSource?.Listeners != null && TraceSource.Listeners.Count > 0) { foreach (TraceListener listener in TraceSource.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
-                if (Trace.Listeners != null && Trace.Listeners.Count > 0) { foreach (TraceListener listener in Trace.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
+                if (System.Diagnostics.Trace.Listeners != null && System.Diagnostics.Trace.Listeners.Count > 0) { foreach (TraceListener listener in System.Diagnostics.Trace.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
             }
             else
             {
@@ -283,7 +362,7 @@ namespace Common
             if (!TraceManager._lockListenersNotifications.Value)
             {
                 if (TraceSource?.Listeners != null && TraceSource.Listeners.Count > 0) { foreach (TraceListener listener in TraceSource.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
-                if (Trace.Listeners != null && Trace.Listeners.Count > 0) { foreach (TraceListener listener in Trace.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
+                if (System.Diagnostics.Trace.Listeners != null && System.Diagnostics.Trace.Listeners.Count > 0) { foreach (TraceListener listener in System.Diagnostics.Trace.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
             }
             else
             {
@@ -300,7 +379,7 @@ namespace Common
             if (!TraceManager._lockListenersNotifications.Value)
             {
                 if (TraceSource?.Listeners != null && TraceSource.Listeners.Count > 0) { foreach (TraceListener listener in TraceSource.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
-                if (Trace.Listeners != null && Trace.Listeners.Count > 0) { foreach (TraceListener listener in Trace.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
+                if (System.Diagnostics.Trace.Listeners != null && System.Diagnostics.Trace.Listeners.Count > 0) { foreach (TraceListener listener in System.Diagnostics.Trace.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
             }
             else
             {
@@ -318,7 +397,7 @@ namespace Common
             if (!TraceManager._lockListenersNotifications.Value)
             {
                 if (TraceSource?.Listeners != null && TraceSource.Listeners.Count > 0) { foreach (TraceListener listener in TraceSource.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
-                if (Trace.Listeners != null && Trace.Listeners.Count > 0) { foreach (TraceListener listener in Trace.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
+                if (System.Diagnostics.Trace.Listeners != null && System.Diagnostics.Trace.Listeners.Count > 0) { foreach (TraceListener listener in System.Diagnostics.Trace.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
             }
             else
             {
@@ -335,7 +414,7 @@ namespace Common
             if (!TraceManager._lockListenersNotifications.Value)
             {
                 if (TraceSource?.Listeners != null && TraceSource.Listeners.Count > 0) { foreach (TraceListener listener in TraceSource.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
-                if (Trace.Listeners != null && Trace.Listeners.Count > 0) { foreach (TraceListener listener in Trace.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
+                if (System.Diagnostics.Trace.Listeners != null && System.Diagnostics.Trace.Listeners.Count > 0) { foreach (TraceListener listener in System.Diagnostics.Trace.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
             }
             else
             {
@@ -352,7 +431,7 @@ namespace Common
             if (!TraceManager._lockListenersNotifications.Value)
             {
                 if (TraceSource?.Listeners != null && TraceSource.Listeners.Count > 0) { foreach (TraceListener listener in TraceSource.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
-                if (Trace.Listeners != null && Trace.Listeners.Count > 0) { foreach (TraceListener listener in Trace.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
+                if (System.Diagnostics.Trace.Listeners != null && System.Diagnostics.Trace.Listeners.Count > 0) { foreach (TraceListener listener in System.Diagnostics.Trace.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
             }
             else
             {
@@ -387,7 +466,7 @@ namespace Common
             if (!TraceManager._lockListenersNotifications.Value)
             {
                 if (TraceSource?.Listeners != null && TraceSource.Listeners.Count > 0) { foreach (TraceListener listener in TraceSource.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
-                if (Trace.Listeners != null && Trace.Listeners.Count > 0) { foreach (TraceListener listener in Trace.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
+                if (System.Diagnostics.Trace.Listeners != null && System.Diagnostics.Trace.Listeners.Count > 0) { foreach (TraceListener listener in System.Diagnostics.Trace.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
             }
             else
             {
@@ -410,7 +489,7 @@ namespace Common
                 {
                     var entry = new TraceEntry() { TraceEventType = TraceEventType.Stop, TraceSource = this.TraceSource, Message = null, Properties = this.Properties, Source = this.Source, Category = this.Category, SourceLevel = this.SourceLevel, CodeSection = this, Thread = Thread.CurrentThread, ThreadID = Thread.CurrentThread.ManagedThreadId, ApartmentState = Thread.CurrentThread.GetApartmentState(), ElapsedMilliseconds = TraceManager.Stopwatch.ElapsedMilliseconds, TraceStartTicks = startTicks };
                     if (TraceSource?.Listeners != null && TraceSource.Listeners.Count > 0) { foreach (TraceListener listener in TraceSource.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
-                    if (Trace.Listeners != null && Trace.Listeners.Count > 0) { foreach (TraceListener listener in Trace.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
+                    if (System.Diagnostics.Trace.Listeners != null && System.Diagnostics.Trace.Listeners.Count > 0) { foreach (TraceListener listener in System.Diagnostics.Trace.Listeners) { try { listener.WriteLine(entry); } catch (Exception) { } } }
                 }
                 else
                 {

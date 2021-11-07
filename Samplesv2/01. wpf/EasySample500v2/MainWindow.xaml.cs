@@ -58,6 +58,7 @@ namespace EasySample
 
                 await sampleMethod1Async();
 
+                _logger.LogTrace("this is a trace trace"); // , properties: new Dictionary<string, object>() { { "", "" } }
                 _logger.LogDebug("this is a debug trace"); // , properties: new Dictionary<string, object>() { { "", "" } }
                 _logger.LogInformation(() => "this is a Information trace", "User"); // , properties: new Dictionary<string, object>() { { "", "" } }
                 _logger.LogInformation(() => "this is a Information trace", "Raw");
@@ -67,6 +68,7 @@ namespace EasySample
                 _logger.LogError(() => "this is a error trace", "Resource");
 
                 //TraceManager.Debug("")
+                scope.LogDebug(() => "this is a trace trace", "User"); // , properties: new Dictionary<string, object>() { { "", "" } }
                 scope.LogDebug(() => "this is a debug trace", "User"); // , properties: new Dictionary<string, object>() { { "", "" } }
                 scope.LogInformation(() => "this is a debug trace", "User"); // , properties: new Dictionary<string, object>() { { "", "" } }
                 scope.LogInformation(() => "this is a Information trace", "Raw");
@@ -89,6 +91,7 @@ namespace EasySample
                 try
                 {
                     // _logger.
+                    _logger.LogTrace("this is a Trace trace", "event");
                     _logger.LogDebug("this is a debug trace", "User", new Metrics() {
                         { "User", 123 },
                         { "Tags", new[] { "sample", "user", "advanced" } }
@@ -98,12 +101,14 @@ namespace EasySample
                     _logger.LogWarning("this is a Warning trace", "User.Report");
                     _logger.LogError("this is a error trace", "Resource");
 
+                    TraceLogger.LogTrace(() => "this is a trace trace", "User"); // , properties: new Dictionary<string, object>() { { "", "" } }
                     TraceLogger.LogDebug(() => "this is a debug trace", "User"); // , properties: new Dictionary<string, object>() { { "", "" } }
                     TraceLogger.LogInformation(() => "this is a Information trace", "User"); // , properties: new Dictionary<string, object>() { { "", "" } }
                     TraceLogger.LogInformation(() => "this is a Information trace", "Raw");
                     TraceLogger.LogWarning(() => "this is a Warning trace", "User.Report");
                     TraceLogger.LogError(() => "this is a error trace", "Resource");
 
+                    scope.LogTrace(() => "this is a trace trace", "User"); // , properties: new Dictionary<string, object>() { { "", "" } }
                     scope.LogDebug(() => "this is a debug trace", "User"); // , properties: new Dictionary<string, object>() { { "", "" } }
                     scope.LogInformation(() => "this is a Information trace", "User"); // , properties: new Dictionary<string, object>() { { "", "" } }
                     scope.LogInformation(() => "this is a Information trace", "Raw");

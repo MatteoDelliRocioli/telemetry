@@ -90,9 +90,9 @@ namespace Common
                     foreach (TraceListener listener in tracesourcelisteners) { try { listener.WriteLine(entry); } catch (Exception) { } }
                 }
 
-                if (Trace.Listeners != null)
+                if (System.Diagnostics.Trace.Listeners != null)
                 {
-                    var traceListeners = Trace.Listeners?.OfType<TraceListener>()?.ToList();
+                    var traceListeners = System.Diagnostics.Trace.Listeners?.OfType<TraceListener>()?.ToList();
                     foreach (TraceListener listener in traceListeners) { try { listener.WriteLine(entry); } catch (Exception) { } }
                 }
             });
@@ -125,7 +125,7 @@ namespace Common
                                 type = "System.Diagnostics.DefaultTraceListener, System.Diagnostics.TraceSource"
                             }
                         };
-                        ApplyListenerConfig(defaultConfig, Trace.Listeners);
+                        ApplyListenerConfig(defaultConfig, System.Diagnostics.Trace.Listeners);
 
                         var systemDiagnosticsConfig = new SystemDiagnosticsConfig();
                         configuration.GetSection("system.diagnostics").Bind(systemDiagnosticsConfig);
@@ -145,14 +145,14 @@ namespace Common
                         });
                         Config?.sharedListeners?.ForEach(lc =>
                         {
-                            ApplyListenerConfig(lc, Trace.Listeners);
+                            ApplyListenerConfig(lc, System.Diagnostics.Trace.Listeners);
                         });
                     }
                     catch (Exception ex)
                     {
                         var message = $"Exception '{ex.GetType().Name}' occurred: {ex.Message}\r\nAdditional Information:\r\n{ex}";
                         sec.Exception(new InvalidDataException(message, ex));
-                        Trace.WriteLine(message);
+                        System.Diagnostics.Trace.WriteLine(message);
                     }
                 }
             }
@@ -199,12 +199,52 @@ namespace Common
             return sec;
         }
 
-        //public static void Debug(object obj, string category = null, string source = null, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
-        //{
-        //    var caller = CallContext.LogicalGetData("CurrentCodeSection") as CodeSection;
-        //    if (caller == null) { var type = typeof(Application); caller = new CodeSection(type, null, null, null, SourceLevels.Verbose, category, properties, source, memberName, sourceFilePath, sourceLineNumber, true); }
-        //    caller.Debug(obj, category, source);
-        //}
+        public static void Trace(object obj, string category = null, IDictionary<string, object> properties = null, string source = null, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
+        {
+            var startTicks = TraceManager.Stopwatch.ElapsedTicks;
+            var type = typeof(InternalClass);
+            var caller = CodeSectionBase.Current.Value;
+            var innerCodeSection = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSection(type, null, null, null, SourceLevels.Verbose, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
+            var innerCodeSectionLogger = innerCodeSection as ICodeSectionLogger;
+            innerCodeSectionLogger.Trace(obj, category, properties, source);
+        }
+        public static void Trace(NonFormattableString message, string category = null, IDictionary<string, object> properties = null, string source = null, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
+        {
+            var startTicks = TraceManager.Stopwatch.ElapsedTicks;
+            var type = typeof(InternalClass);
+            var caller = CodeSectionBase.Current.Value;
+            var innerCodeSection = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSection(type, null, null, null, SourceLevels.Verbose, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
+            var innerCodeSectionLogger = innerCodeSection as ICodeSectionLogger;
+            innerCodeSectionLogger.Trace(message, category, properties, source);
+        }
+        public static void Trace(FormattableString message, string category = null, IDictionary<string, object> properties = null, string source = null, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
+        {
+            var startTicks = TraceManager.Stopwatch.ElapsedTicks;
+            var type = typeof(InternalClass);
+            var caller = CodeSectionBase.Current.Value;
+            var innerCodeSection = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSection(type, null, null, null, SourceLevels.Verbose, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
+            var innerCodeSectionLogger = innerCodeSection as ICodeSectionLogger;
+            innerCodeSectionLogger.Trace(message, category, properties, source);
+        }
+        public static void Trace(Func<string> getMessage, string category = null, IDictionary<string, object> properties = null, string source = null, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
+        {
+            var startTicks = TraceManager.Stopwatch.ElapsedTicks;
+            var type = typeof(InternalClass);
+            var caller = CodeSectionBase.Current.Value;
+            var innerCodeSection = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSection(type, null, null, null, SourceLevels.Verbose, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
+            var innerCodeSectionLogger = innerCodeSection as ICodeSectionLogger;
+            innerCodeSectionLogger.Trace(getMessage, category, properties, source);
+        }
+
+        public static void Debug(object obj, string category = null, IDictionary<string, object> properties = null, string source = null, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
+        {
+            var startTicks = TraceManager.Stopwatch.ElapsedTicks;
+            var type = typeof(InternalClass);
+            var caller = CodeSectionBase.Current.Value;
+            var innerCodeSection = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSection(type, null, null, null, SourceLevels.Verbose, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
+            var innerCodeSectionLogger = innerCodeSection as ICodeSectionLogger;
+            innerCodeSectionLogger.Debug(obj, category, properties, source);
+        }
         public static void Debug(NonFormattableString message, string category = null, IDictionary<string, object> properties = null, string source = null, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
         {
             var startTicks = TraceManager.Stopwatch.ElapsedTicks;
@@ -419,7 +459,7 @@ namespace Common
                         var listener = default(TraceListener);
                         Type t = Type.GetType(listenerConfig.type);
                         try { listener = Activator.CreateInstance(t) as TraceListener; }
-                        catch (Exception ex) { Trace.WriteLine($"Failed to create Trace Listener '{listenerConfig.type}':\r\nAdditional information: {ex.Message}\r\n{ex.ToString()}"); }
+                        catch (Exception ex) { System.Diagnostics.Trace.WriteLine($"Failed to create Trace Listener '{listenerConfig.type}':\r\nAdditional information: {ex.Message}\r\n{ex.ToString()}"); }
                         if (listener != null)
                         {
                             listener.Name = listenerConfig.name;
@@ -453,7 +493,7 @@ namespace Common
                         var listener = default(TraceListener);
                         Type t = Type.GetType(listenerConfig.type);
                         try { listener = Activator.CreateInstance(t) as TraceListener; }
-                        catch (Exception ex) { Trace.WriteLine($"Failed to create Trace Listener '{listenerConfig.type}':\r\nAdditional information: {ex.Message}\r\n{ex.ToString()}"); }
+                        catch (Exception ex) { System.Diagnostics.Trace.WriteLine($"Failed to create Trace Listener '{listenerConfig.type}':\r\nAdditional information: {ex.Message}\r\n{ex.ToString()}"); }
                         if (listener != null)
                         {
                             listener.Name = listenerConfig.name;
@@ -516,7 +556,7 @@ namespace Common
                         {
                             Type t = Type.GetType(listenerConfig.type);
                             try { listener = Activator.CreateInstance(t) as TraceListener; }
-                            catch (Exception ex) { Trace.WriteLine($"Failed to create Trace Listener '{listenerConfig.type}':\r\nAdditional information: {ex.Message}\r\n{ex.ToString()}"); }
+                            catch (Exception ex) { System.Diagnostics.Trace.WriteLine($"Failed to create Trace Listener '{listenerConfig.type}':\r\nAdditional information: {ex.Message}\r\n{ex.ToString()}"); }
                             if (listener != null)
                             {
                                 listener.Name = listenerConfig.name;

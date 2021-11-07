@@ -54,7 +54,7 @@ namespace Common
             this.ModuleContext = pCopy.ModuleContext;
         }
 
-        public CodeSectionScope(ILogger logger, Type type, string name = null, object payload = null, TraceSource traceSource = null, SourceLevels sourceLevel = SourceLevels.Verbose, LogLevel logLevel = LogLevel.Trace, string category = null, IDictionary<string, object> properties = null, string source = null, long startTicks = 0, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0, bool disableStartEndTraces = false)
+        public CodeSectionScope(ILogger logger, Type type, string name = null, object payload = null, TraceSource traceSource = null, SourceLevels sourceLevel = SourceLevels.Verbose, LogLevel logLevel = LogLevel.Debug, string category = null, IDictionary<string, object> properties = null, string source = null, long startTicks = 0, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0, bool disableStartEndTraces = false)
         {
             this.Name = name;
             this.Payload = payload;
@@ -185,6 +185,93 @@ namespace Common
             }
         }
         #endregion
+
+        public void LogTrace(object obj, string category = null, IDictionary<string, object> properties = null, string source = null, bool disableCRLFReplace = false)
+        {
+            var startTicks = TraceLogger.Stopwatch.ElapsedTicks;
+
+            var message = obj.GetLogString();
+
+            var entry = new TraceEntry() { Message = message, TraceEventType = TraceEventType.Verbose, SourceLevel = SourceLevels.Verbose, LogLevel = LogLevel.Trace, Properties = properties, Source = source ?? this.Source, Category = category, CodeSectionBase = this, Thread = Thread.CurrentThread, ThreadID = Thread.CurrentThread.ManagedThreadId, ApartmentState = Thread.CurrentThread.GetApartmentState(), DisableCRLFReplace = disableCRLFReplace, ElapsedMilliseconds = TraceLogger.Stopwatch.ElapsedMilliseconds, TraceStartTicks = startTicks };
+            if (!TraceLogger._lockListenersNotifications.Value && _logger != null)
+            {
+                _logger.Log<TraceEntry>(entry.LogLevel, default(EventId), entry, null, (e, ex) => e.ToString());
+            }
+            else
+            {
+                TraceLogger._pendingEntries.Enqueue(entry);
+                //if (TraceLogger._isInitializeComplete.Value == false && TraceLogger._isInitializing.Value == false) { TraceLogger.Init(null); }
+            }
+        }
+        public void LogTrace(NonFormattableString message, string category = null, IDictionary<string, object> properties = null, string source = null, bool disableCRLFReplace = false)
+        {
+            var startTicks = TraceLogger.Stopwatch.ElapsedTicks;
+
+            var entry = new TraceEntry() { Message = message.Value, TraceEventType = TraceEventType.Verbose, SourceLevel = SourceLevels.Verbose, LogLevel = LogLevel.Trace, Properties = properties, Source = source ?? this.Source, Category = category, CodeSectionBase = this, Thread = Thread.CurrentThread, ThreadID = Thread.CurrentThread.ManagedThreadId, ApartmentState = Thread.CurrentThread.GetApartmentState(), DisableCRLFReplace = disableCRLFReplace, ElapsedMilliseconds = TraceLogger.Stopwatch.ElapsedMilliseconds, TraceStartTicks = startTicks };
+            if (!TraceLogger._lockListenersNotifications.Value && _logger != null)
+            {
+                _logger.Log<TraceEntry>(entry.LogLevel, default(EventId), entry, null, (e, ex) => e.ToString());
+            }
+            else
+            {
+                TraceLogger._pendingEntries.Enqueue(entry);
+                //if (TraceLogger._isInitializeComplete.Value == false && TraceLogger._isInitializing.Value == false) { TraceLogger.Init(null); }
+            }
+        }
+        public void LogTrace(FormattableString message, string category = null, IDictionary<string, object> properties = null, string source = null, bool disableCRLFReplace = false)
+        {
+            var startTicks = TraceLogger.Stopwatch.ElapsedTicks;
+
+            try
+            {
+                var entry = new TraceEntry()
+                {
+                    Message = string.Format(message.Format, message.GetArguments()),
+                    TraceEventType = TraceEventType.Verbose,
+                    SourceLevel = SourceLevels.Verbose,
+                    LogLevel = LogLevel.Trace,
+                    Properties = properties,
+                    Source = source ?? this.Source,
+                    Category = category,
+                    CodeSectionBase = this,
+                    Thread = Thread.CurrentThread,
+                    ThreadID = Thread.CurrentThread.ManagedThreadId,
+                    ApartmentState = Thread.CurrentThread.GetApartmentState(),
+                    DisableCRLFReplace = disableCRLFReplace,
+                    ElapsedMilliseconds = TraceLogger.Stopwatch.ElapsedMilliseconds,
+                    TraceStartTicks = startTicks
+                };
+                if (!TraceLogger._lockListenersNotifications.Value && _logger != null)
+                {
+                    _logger.Log<TraceEntry>(entry.LogLevel, default(EventId), entry, null, (e, ex) => e.ToString());
+                }
+                else
+                {
+                    TraceLogger._pendingEntries.Enqueue(entry);
+                    //if (TraceLogger._isInitializeComplete.Value == false && TraceLogger._isInitializing.Value == false) { TraceLogger.Init(null); }
+                }
+            }
+            catch (Exception) { }
+        }
+        public void LogTrace(Func<string> getMessage, string category = null, IDictionary<string, object> properties = null, string source = null, bool disableCRLFReplace = false)
+        {
+            var startTicks = TraceLogger.Stopwatch.ElapsedTicks;
+
+            try
+            {
+                var entry = new TraceEntry() { GetMessage = getMessage, TraceEventType = TraceEventType.Verbose, SourceLevel = SourceLevels.Verbose, LogLevel = LogLevel.Trace, Properties = properties, Source = source ?? this.Source, Category = category, CodeSectionBase = this, Thread = Thread.CurrentThread, ThreadID = Thread.CurrentThread.ManagedThreadId, ApartmentState = Thread.CurrentThread.GetApartmentState(), DisableCRLFReplace = disableCRLFReplace, ElapsedMilliseconds = TraceLogger.Stopwatch.ElapsedMilliseconds, TraceStartTicks = startTicks };
+                if (!TraceLogger._lockListenersNotifications.Value && _logger != null)
+                {
+                    _logger.Log<TraceEntry>(entry.LogLevel, default(EventId), entry, null, (e, ex) => e.ToString());
+                }
+                else
+                {
+                    TraceLogger._pendingEntries.Enqueue(entry);
+                    //if (TraceLogger._isInitializeComplete.Value == false && TraceLogger._isInitializing.Value == false) { TraceLogger.Init(null); }
+                }
+            }
+            catch (Exception) { }
+        }
 
         public void LogDebug(object obj, string category = null, IDictionary<string, object> properties = null, string source = null, bool disableCRLFReplace = false)
         {
@@ -508,6 +595,15 @@ namespace Common
         #endregion
 
         private Type GetType<T>(T t) { return typeof(T); }
+
+        [Obsolete("Obsolete method, please, use LogDebug method instead")]
+        void ICodeSectionLogger.Trace(object obj, string category, IDictionary<string, object> properties, string source, bool disableCRLFReplace) { this.LogTrace(obj, category, properties, source, disableCRLFReplace); }
+        [Obsolete("Obsolete method, please, use LogDebug method instead")]
+        void ICodeSectionLogger.Trace(NonFormattableString message, string category, IDictionary<string, object> properties, string source, bool disableCRLFReplace) { this.LogTrace(message, category, properties, source, disableCRLFReplace); }
+        [Obsolete("Obsolete method, please, use LogDebug method instead")]
+        void ICodeSectionLogger.Trace(FormattableString message, string category, IDictionary<string, object> properties, string source, bool disableCRLFReplace) { this.LogTrace(message, category, properties, source, disableCRLFReplace); }
+        [Obsolete("Obsolete method, please, use LogDebug method instead")]
+        public void Trace(Func<string> getMessage, string category = null, IDictionary<string, object> properties = null, string source = null, bool disableCRLFReplace = false) { this.LogTrace(getMessage, category, properties, source, disableCRLFReplace); }
 
         [Obsolete("Obsolete method, please, use LogDebug method instead")]
         void ICodeSectionLogger.Debug(object obj, string category, IDictionary<string, object> properties, string source, bool disableCRLFReplace) { this.LogDebug(obj, category, properties, source, disableCRLFReplace); }
