@@ -572,7 +572,8 @@ namespace Common
                 ApartmentState = Thread.CurrentThread.GetApartmentState(),
                 DisableCRLFReplace = disableCRLFReplace,
                 ElapsedMilliseconds = TraceLogger.Stopwatch.ElapsedMilliseconds,
-                TraceStartTicks = startTicks
+                TraceStartTicks = startTicks,
+                Exception = exception
             };
             if (!TraceLogger._lockListenersNotifications.Value)
             {

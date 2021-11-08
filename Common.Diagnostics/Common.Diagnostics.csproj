@@ -17,6 +17,10 @@
 		<AssemblyOriginatorKeyFile>diginsight.snk</AssemblyOriginatorKeyFile>
 	</PropertyGroup>
 
+	<ItemGroup>
+	  <Compile Remove="Providers\TraceLoggerAppinsightProvider.cs" />
+	</ItemGroup>
+
 	<!--<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netcoreapp3.1|AnyCPU'">
 		<WarningsAsErrors>NU1605</WarningsAsErrors>
 		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>

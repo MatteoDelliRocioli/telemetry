@@ -1,11 +1,13 @@
-﻿using EasySampleBlazorv2.Shared;
+﻿#region using
+using EasySampleBlazorv2.Shared;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using Common;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Threading.Tasks; 
+#endregion
 
 namespace EasySampleBlazorv2.Server.Controllers
 {
@@ -20,25 +22,27 @@ namespace EasySampleBlazorv2.Server.Controllers
         public WeatherForecastController(ILogger<WeatherForecastController> logger)
         {
             _logger = logger;
-        } 
+        }
 
         [HttpGet]
         public IEnumerable<WeatherForecast> Get()
         {
-            using (var scope = _logger.BeginMethodScope())
-            {
-                var rng = new Random();
-                var res = Enumerable.Range(1, 5).Select(index => new WeatherForecast
-                {
-                    Date = DateTime.Now.AddDays(index),
-                    TemperatureC = rng.Next(-20, 55),
-                    Summary = Summaries[rng.Next(Summaries.Length)]
-                })
-                .ToArray();
+            using var scope = _logger.BeginMethodScope();
 
-                scope.Result = res;
-                return res;
-            }
+            var rng = new Random();
+            var res = Enumerable.Range(1, 5).Select(index => new WeatherForecast
+            {
+                Date = DateTime.Now.AddDays(index),
+                TemperatureC = rng.Next(-20, 55),
+                Summary = Summaries[rng.Next(Summaries.Length)]
+            })
+            .ToArray();
+
+            scope.Result = res;
+
+            scope.LogException(new NullReferenceException());
+
+            return res;
         }
     }
 }
