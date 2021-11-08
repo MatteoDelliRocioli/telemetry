@@ -28,7 +28,7 @@ namespace EasySampleBlazorv2.Server
             var builder = CreateHostBuilder(args)
                           .ConfigureLogging((context, loggingBuilder) =>
                           {
-                              using var scopeInner = TraceLogger.BeginNamedScope(T, "UseEndpoints.ConfigureCallback");
+                              using var scopeInner = TraceLogger.BeginNamedScope(T, "ConfigureLogging.Callback");
 
                               loggingBuilder.ClearProviders(); scopeInner.LogDebug($"loggingBuilder.ClearProviders();");
 
