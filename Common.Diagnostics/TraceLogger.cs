@@ -192,8 +192,10 @@ namespace Common
                 {
                     try
                     {
-                        if (!TraceLogger._lockListenersNotifications.Value) //  && _logger != null
+                        if (!TraceLogger._lockListenersNotifications.Value) 
                         {
+                            //if (_logger == null) { _logger = GetEntrylogger(ref entry); }
+
                             IFormatTraceEntry iFormatTraceEntry = Provider as IFormatTraceEntry;
                             Func<TraceEntry, Exception, string> formatTraceEntry = iFormatTraceEntry != null ? (Func<TraceEntry, Exception, string>)iFormatTraceEntry.FormatTraceEntry : null;
                             listener.Log(logLevel, eventId, entry, exception, formatTraceEntry);
@@ -213,6 +215,17 @@ namespace Common
             return;
         }
 
+        #region GetEntrylogger
+        private static ILogger GetEntrylogger(ref TraceEntry entry)
+        {
+            var t = entry.CodeSectionBase?.T;
+            Type loggerType = typeof(ILogger<>);
+            loggerType = loggerType.MakeGenericType(new[] { t });
+            var host = TraceLogger.Host;
+            var loggerTemp = host.Services.GetRequiredService(loggerType) as ILogger;
+            return loggerTemp;
+        }
+        #endregion
         // helpers
         public static CodeSectionScope BeginMethodScope<T>(object payload = null, SourceLevels sourceLevel = SourceLevels.Verbose, LogLevel logLevel = LogLevel.Debug, string category = null, IDictionary<string, object> properties = null, string source = null, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
         {
