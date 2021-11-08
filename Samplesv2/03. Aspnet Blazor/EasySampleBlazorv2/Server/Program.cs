@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿#region using
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -12,34 +13,46 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging.ApplicationInsights;
 using Microsoft.Extensions.Logging.Debug;
 using Microsoft.Extensions.Logging.AzureAppServices;
+#endregion
 
 namespace EasySampleBlazorv2.Server
 {
     public class Program
     {
+        private static Type T = typeof(Program);
+
         public static void Main(string[] args)
         {
+            using var scope = TraceLogger.BeginMethodScope(T);
+
             var builder = CreateHostBuilder(args)
                           .ConfigureLogging((context, loggingBuilder) =>
                           {
-                              loggingBuilder.ClearProviders();
+                              using var scopeInner = TraceLogger.BeginNamedScope(T, "UseEndpoints.ConfigureCallback");
+
+                              loggingBuilder.ClearProviders(); scopeInner.LogDebug($"loggingBuilder.ClearProviders();");
 
                               var options = new Log4NetProviderOptions();
                               options.Log4NetConfigFileName = "log4net.config";
                               var log4NetProvider = new Log4NetProvider(options);
-                              loggingBuilder.AddDiginsightFormatted(log4NetProvider, context.Configuration);
+                              loggingBuilder.AddDiginsightFormatted(log4NetProvider, context.Configuration); scopeInner.LogDebug($"loggingBuilder.AddDiginsightFormatted(log4NetProvider, context.Configuration);");
 
-                              //TelemetryConfiguration telemetryConfiguration = new TelemetryConfiguration("6600ae1e-1466-4ad4-aea7-c017a8ab5dce");
-                              //ApplicationInsightsLoggerOptions appinsightOptions = new ApplicationInsightsLoggerOptions();
-                              //var tco = Options.Create<TelemetryConfiguration>(telemetryConfiguration);
-                              //var aio = Options.Create<ApplicationInsightsLoggerOptions>(appinsightOptions);
-                              //loggingBuilder.AddDiginsightJson(new ApplicationInsightsLoggerProvider(tco, aio), context.Configuration);
-                              ////loggingBuilder.AddFilter<ApplicationInsightsLoggerProvider>("", LogLevel.Debug);
+                              // AppInsightsKey
+                              var appInsightsKey = context.Configuration["AppSettings:AppInsightsKey"]; scopeInner.LogDebug(new { appInsightsKey });
+                              if (!string.IsNullOrEmpty(appInsightsKey))
+                              {
+                                  TelemetryConfiguration telemetryConfiguration = new TelemetryConfiguration(appInsightsKey);
+                                  ApplicationInsightsLoggerOptions appinsightOptions = new ApplicationInsightsLoggerOptions();
+                                  var tco = Options.Create<TelemetryConfiguration>(telemetryConfiguration);
+                                  var aio = Options.Create<ApplicationInsightsLoggerOptions>(appinsightOptions);
+                                  loggingBuilder.AddDiginsightJson(new ApplicationInsightsLoggerProvider(tco, aio), context.Configuration); scopeInner.LogDebug($"loggingBuilder.AddDiginsightJson(new ApplicationInsightsLoggerProvider(tco, aio), {context.Configuration.GetLogString()});");
+                                  //loggingBuilder.AddFilter<ApplicationInsightsLoggerProvider>("", LogLevel.Debug);
+                              }
 
                               var debugProvider = new TraceLoggerDebugProvider();
                               var traceLoggerProvider = new TraceLoggerFormatProvider(context.Configuration) { ConfigurationSuffix = "Debug" };
                               traceLoggerProvider.AddProvider(debugProvider);
-                              loggingBuilder.AddProvider(traceLoggerProvider); // i.e. builder.Services.AddSingleton(traceLoggerProvider);
+                              loggingBuilder.AddProvider(traceLoggerProvider); scopeInner.LogDebug($"loggingBuilder.AddProvider(traceLoggerProvider);");
 
                               // loggingBuilder.AddAzureWebAppDiagnostics(); // STREAMING LOG not working ?
 
@@ -58,18 +71,23 @@ namespace EasySampleBlazorv2.Server
 
             host.InitTraceLogger();
 
-            var logger = host.GetLogger<Program>();
-            using (var scope = logger.BeginMethodScope())
-            {
-                host.Run();
-            }
+            //var logger = host.GetLogger<Program>();
+            //using (var scope = logger.BeginMethodScope())
+            //{
+            host.Run();
+            //}
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
+        public static IHostBuilder CreateHostBuilder(string[] args)
+        {
+            using var scope = TraceLogger.BeginMethodScope(T);
+
+            var webHostBuilder = Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
                 });
+            return webHostBuilder;
+        }
     }
 }
