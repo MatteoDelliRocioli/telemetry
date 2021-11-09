@@ -40,7 +40,7 @@ namespace EasySampleBlazorv2.Server.Controllers
 
             scope.Result = res;
 
-            scope.LogException(new NullReferenceException());
+            // scope.LogException(new NullReferenceException());
 
             return res;
         }

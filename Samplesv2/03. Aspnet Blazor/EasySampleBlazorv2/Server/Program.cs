@@ -46,7 +46,7 @@ namespace EasySampleBlazorv2.Server
                                   var tco = Options.Create<TelemetryConfiguration>(telemetryConfiguration);
                                   var aio = Options.Create<ApplicationInsightsLoggerOptions>(appinsightOptions);
                                   loggingBuilder.AddDiginsightFormatted(new ApplicationInsightsLoggerProvider(tco, aio), context.Configuration); scopeInner.LogDebug($"loggingBuilder.AddDiginsightFormatted(new ApplicationInsightsLoggerProvider(tco, aio), {context.Configuration.GetLogString()});");
-                                  // loggingBuilder.AddDiginsightJson(new ApplicationInsightsLoggerProvider(tco, aio), context.Configuration); scopeInner.LogDebug($"loggingBuilder.AddDiginsightJson(new ApplicationInsightsLoggerProvider(tco, aio), {context.Configuration.GetLogString()});");
+                                  //loggingBuilder.AddDiginsightJson(new ApplicationInsightsLoggerProvider(tco, aio), context.Configuration); scopeInner.LogDebug($"loggingBuilder.AddDiginsightJson(new ApplicationInsightsLoggerProvider(tco, aio), {context.Configuration.GetLogString()});");
                                   // loggingBuilder.AddFilter<ApplicationInsightsLoggerProvider>("", LogLevel.Debug);
                               }
 
