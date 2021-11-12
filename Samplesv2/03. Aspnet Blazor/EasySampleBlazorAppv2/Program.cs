@@ -17,24 +17,28 @@ namespace EasySampleBlazorAppv2
 {
     public class Program
     {
+        private static Type T = typeof(Program);
+
         public static async Task Main(string[] args)
         {
-            var builder = WebAssemblyHostBuilder.CreateDefault(args);
-            builder.RootComponents.Add<App>("#app");
+            using var scope = TraceLogger.BeginMethodScope(T);
 
-            builder.Logging.SetMinimumLevel(LogLevel.Debug);
-            var serviceProvider = builder.Services.BuildServiceProvider();
+            var builder = WebAssemblyHostBuilder.CreateDefault(args); scope.LogDebug($"WebAssemblyHostBuilder.CreateDefault(args); returned {builder.GetLogString()}");
+            builder.RootComponents.Add<App>("#app"); scope.LogDebug($"builder.RootComponents.Add<App>('#app');");
+
+            builder.Logging.SetMinimumLevel(LogLevel.Debug); scope.LogDebug($"builder.Logging.SetMinimumLevel({LogLevel.Debug});");
+            var serviceProvider = builder.Services.BuildServiceProvider(); scope.LogDebug($"var serviceProvider = builder.Services.BuildServiceProvider();");
 
             // replaces the provider with the trace logger provider
-            builder.Logging.ClearProviders();
-            builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging"));
+            builder.Logging.ClearProviders(); scope.LogDebug($"builder.Logging.ClearProviders();");
+            builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging")); scope.LogDebug($"builder.Logging.AddConfiguration(builder.Configuration.GetSection('Logging'));");
 
             var consoleProvider = new TraceLoggerConsoleProvider();
-            var traceLoggerProvider = new TraceLoggerFormatProvider(builder.Configuration) { ConfigurationSuffix = "Console" };
-            traceLoggerProvider.AddProvider(consoleProvider);
-            builder.Logging.AddProvider(traceLoggerProvider); // i.e. builder.Services.AddSingleton(traceLoggerProvider);
+            var traceLoggerConsoleProvider = new TraceLoggerFormatProvider(builder.Configuration) { ConfigurationSuffix = "Console" };
+            traceLoggerConsoleProvider.AddProvider(consoleProvider);
+            builder.Logging.AddProvider(traceLoggerConsoleProvider); scope.LogDebug($"builder.Logging.AddProvider(traceLoggerConsoleProvider);");
 
-            var appInsightsKey = builder.Configuration["AppSettings:AppInsightsKey"]; Console.WriteLine($"appInsightsKey:{appInsightsKey}");
+            var appInsightsKey = builder.Configuration["AppSettings:AppInsightsKey"]; scope.LogDebug(new { appInsightsKey });
             var appInsights = new ApplicationInsights(async applicationInsights =>
             {
                 await applicationInsights.SetInstrumentationKey(appInsightsKey);
@@ -50,31 +54,26 @@ namespace EasySampleBlazorAppv2
                 await applicationInsights.AddTelemetryInitializer(telemetryItem);
             });
             var appinsightProvider = new ApplicationInsightsLoggerProvider(appInsights);
-            var appinsightJsonLoggerProvider = new TraceLoggerJsonProvider(builder.Configuration) { ConfigurationSuffix = "Appinsights" };
-            appinsightJsonLoggerProvider.AddProvider(appinsightProvider);
-            builder.Logging.AddProvider(appinsightJsonLoggerProvider); // i.e. builder.Services.AddSingleton(traceLoggerProvider);
+            //var appinsightJsonLoggerProvider = new TraceLoggerJsonProvider(builder.Configuration) { ConfigurationSuffix = "Appinsights" };
+            var appinsightFormatLoggerProvider = new TraceLoggerFormatProvider(builder.Configuration) { ConfigurationSuffix = "Appinsights" };
+            appinsightFormatLoggerProvider.AddProvider(appinsightProvider);
+            builder.Logging.AddProvider(appinsightFormatLoggerProvider); scope.LogDebug($"builder.Logging.AddProvider(appinsightFormatLoggerProvider);");
+            builder.Services.AddSingleton<IApplicationInsights, ApplicationInsights>(sp => appInsights); scope.LogDebug($"builder.Services.AddSingleton<IApplicationInsights, ApplicationInsights>(sp => appInsights);");
 
-            builder.Services.AddSingleton<IApplicationInsights, ApplicationInsights>(sp => appInsights);
+            serviceProvider = builder.Services.BuildServiceProvider(); scope.LogDebug($"serviceProvider = builder.Services.BuildServiceProvider();");
 
-            serviceProvider = builder.Services.BuildServiceProvider();
-            ILoggerFactory loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
-            Console.WriteLine($"loggerFactory: '{loggerFactory}'");
+            var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>(); scope.LogDebug($"var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();");
 
             // gets a logger from the ILoggerFactory
-            var logger = loggerFactory.CreateLogger<Program>();
-            Console.WriteLine($"logger: '{logger}'");
+            var logger = loggerFactory.CreateLogger<Program>(); scope.LogDebug($"var logger = loggerFactory.CreateLogger<Program>();");
+            builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) }); scope.LogDebug($"builder.Services.AddScoped(sp => new HttpClient({builder.HostEnvironment.BaseAddress}));");
 
-            using (var scope = logger.BeginMethodScope())
-            {
-                builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+            var host = builder.Build(); scope.LogDebug($"var host = builder.Build();");
+            var ihost = new WebAssemblyIHostAdapter(host) as IHost;
+            //ihost.UseWebCommands();
+            ihost.InitTraceLogger(); scope.LogDebug($"ihost.InitTraceLogger();");
 
-                var host = builder.Build();
-                var ihost = new WebAssemblyIHostAdapter(host) as IHost;
-                //ihost.UseWebCommands();
-                ihost.InitTraceLogger();
-
-                await host.RunAsync();
-            }
+            await host.RunAsync(); scope.LogDebug($"await host.RunAsync();");
         }
     }
 }
