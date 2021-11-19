@@ -616,9 +616,11 @@ namespace Common
             DebugHelper.IfDebug(() =>
             {   // for debug build only check environment setting on appsettings.json
                 builder = new ConfigurationBuilder()
-                              .AddJsonFile(jsonFile, true, true)
-                              .AddUserSecrets(assembly)
-                              .AddInMemoryCollection();
+                              .AddJsonFile(jsonFile, true, true);
+
+                try { builder = builder.AddUserSecrets(assembly); } catch (Exception ex) { /* ignore user secrets if not accessible */ }
+                
+                builder = builder.AddInMemoryCollection();
 
                 builder.AddEnvironmentVariables();
                 configuration = builder.Build();

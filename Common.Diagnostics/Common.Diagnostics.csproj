@@ -15,6 +15,7 @@
 		<Description>provides telemetry with the full application flow to System.Diagnostic listeners.</Description>
 		<SignAssembly>true</SignAssembly>
 		<AssemblyOriginatorKeyFile>diginsight.snk</AssemblyOriginatorKeyFile>
+		<UserSecretsId>ea6bafb2-fe5a-4acb-820e-78ff096f00c7</UserSecretsId>
 	</PropertyGroup>
 
 	<ItemGroup>
