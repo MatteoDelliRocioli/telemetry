@@ -108,7 +108,7 @@ namespace Common
                 {
                     try
                     {
-                        if (_isInitializing.Value!=tid) { return; }
+                        if (_isInitializing.Value != tid) { ThreadHelper.WaitUntil(() => _isInitializing.Value == 0); return; }
                         if (TraceManager.Configuration != null) { return; }
 
                         if (configuration == null) { configuration = GetConfiguration(); }
@@ -127,7 +127,7 @@ namespace Common
                                 type = "System.Diagnostics.DefaultTraceListener, System.Diagnostics.TraceSource"
                             }
                         };
-                        if (_isInitializing.Value != tid) { return; }
+                        if (_isInitializing.Value != tid) { ThreadHelper.WaitUntil(() => _isInitializing.Value == 0); return; }
                         ApplyListenerConfig(defaultConfig, System.Diagnostics.Trace.Listeners);
 
                         var systemDiagnosticsConfig = new SystemDiagnosticsConfig();
@@ -141,7 +141,7 @@ namespace Common
                         var sourceLevel = switchConfig != null ? switchConfig.value : SourceLevels.All;
                         TraceSource = new TraceSource(_traceSourceName, sourceLevel);
 
-                        if (_isInitializing.Value != tid) { return; }
+                        if (_isInitializing.Value != tid) { ThreadHelper.WaitUntil(() => _isInitializing.Value == 0); return; }
                         TraceSource.Listeners.Clear();
 
                         sourceConfig?.listeners?.ForEach(lc =>

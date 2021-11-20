@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Common
@@ -67,6 +68,14 @@ namespace Common
                 default: break;
             }
             return SourceLevels.Verbose;
+        }
+    }
+
+    internal static class ThreadHelper
+    {
+        public static void WaitUntil(Func<bool> condition, int ms = 20)
+        {
+            while (!condition()) { Thread.Sleep(ms); }
         }
     }
 }
