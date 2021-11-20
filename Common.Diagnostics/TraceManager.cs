@@ -45,7 +45,7 @@ namespace Common
         public static string EnvironmentName = null;
         public static int ProcessId = -1;
         internal static Reference<bool> _lockListenersNotifications = new Reference<bool>(true);
-        internal static Reference<bool> _isInitializing = new Reference<bool>(false);
+        internal static Reference<int> _isInitializing = new Reference<int>(0);
         internal static Reference<bool> _isInitializeComplete = new Reference<bool>(false);
         internal static ConcurrentQueue<TraceEntry> _pendingEntries = new ConcurrentQueue<TraceEntry>();
         #endregion
@@ -99,14 +99,16 @@ namespace Common
         }
         public static void Init(SourceLevels filterLevel, IConfiguration configuration)
         {
+            var tid = Thread.CurrentThread.ManagedThreadId;
             using (new SwitchOnDispose(_lockListenersNotifications, true))
-            using (new SwitchOnDispose(_isInitializing, true))
+            using (new SwitchOnDispose<int>(_isInitializing, (s) => { if (s.Value == 0) { s.Value = tid; } }, (s) => { if (s.Value == tid) { s.Value = 0; } }))
             using (new SwitchOnDispose(_isInitializeComplete, false))
             {
                 using (var sec = TraceManager.GetCodeSection(T))
                 {
                     try
                     {
+                        if (_isInitializing.Value!=tid) { return; }
                         if (TraceManager.Configuration != null) { return; }
 
                         if (configuration == null) { configuration = GetConfiguration(); }
@@ -125,6 +127,7 @@ namespace Common
                                 type = "System.Diagnostics.DefaultTraceListener, System.Diagnostics.TraceSource"
                             }
                         };
+                        if (_isInitializing.Value != tid) { return; }
                         ApplyListenerConfig(defaultConfig, System.Diagnostics.Trace.Listeners);
 
                         var systemDiagnosticsConfig = new SystemDiagnosticsConfig();
@@ -137,6 +140,8 @@ namespace Common
 
                         var sourceLevel = switchConfig != null ? switchConfig.value : SourceLevels.All;
                         TraceSource = new TraceSource(_traceSourceName, sourceLevel);
+
+                        if (_isInitializing.Value != tid) { return; }
                         TraceSource.Listeners.Clear();
 
                         sourceConfig?.listeners?.ForEach(lc =>
@@ -619,7 +624,7 @@ namespace Common
                               .AddJsonFile(jsonFile, true, true);
 
                 try { builder = builder.AddUserSecrets(assembly); } catch (Exception ex) { /* ignore user secrets if not accessible */ }
-                
+
                 builder = builder.AddInMemoryCollection();
 
                 builder.AddEnvironmentVariables();

@@ -195,6 +195,50 @@ namespace Common
     }
     #endregion
 
+    #region SwitchOnDispose
+    internal class SwitchOnDispose<T> : IDisposable
+    {
+        #region internal state
+        private Reference<T> _state;
+        private Action<Reference<T>> _disposeAction;
+        #endregion
+        #region .ctor
+        public SwitchOnDispose(Reference<T> state) { }
+        public SwitchOnDispose(Reference<T> state, Action<Reference<T>> disposeAction)
+        {
+            _state = state;
+            _disposeAction = disposeAction;
+        }
+        public SwitchOnDispose(Reference<T> state, T initValue, Action<Reference<T>> disposeAction)
+        {
+            _state = state;
+            _state.Value = initValue;
+            _disposeAction = disposeAction;
+        }
+        public SwitchOnDispose(Reference<T> state, Action<Reference<T>> initAction, Action<Reference<T>> disposeAction)
+        {
+            _state = state;
+            if (initAction != null) initAction(_state);
+            _disposeAction = disposeAction;
+        }
+        #endregion
+        #region Detach
+        public Reference<T> Detach()
+        {
+            Reference<T> state = _state;
+            _state = null;
+            return state;
+        }
+        #endregion
+        #region Dispose
+        public void Dispose()
+        {
+            if (_disposeAction!=null && _state != null) { _disposeAction(_state); }
+        }
+        #endregion
+    }
+    #endregion
+
     internal static class Convert2
     {
         #region ToString(object)
