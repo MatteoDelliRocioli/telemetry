@@ -94,7 +94,7 @@ namespace Common
 
                 return pthis.GetType().ToLogStringInternal();
             }
-            catch (Exception ex) { }
+            catch (Exception /*ex*/) { }
             return null;
         }
         public static string ToLogStringInternal(this KeyValuePair<string, string> pthis)

@@ -45,10 +45,7 @@ namespace EasySample
 
                     throw new InvalidOperationException("this is an exception");
                 }
-                catch (Exception ex)
-                {
-                    //sec.Exception(ex);
-                }
+                catch (Exception /*ex*/) { /*sec.Exception(ex);*/ }
             }
         }
 
