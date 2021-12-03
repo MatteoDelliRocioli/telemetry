@@ -141,6 +141,8 @@ namespace Common
 
             var classNameIndex = this.Name.LastIndexOf('.') + 1;
             var source = classNameIndex >= 0 ? this.Name.Substring(0, classNameIndex) : this.Name;
+            if (source.EndsWith(".")) { source = source.TrimEnd('.'); }
+            
             var sec = new CodeSectionScope(this, this.Name, null, null, TraceLogger.TraceSource, SourceLevels.Verbose, LogLevel.Debug, this.Name, null, source, startTicks, state?.ToString(), null, -1);
             return sec;
         }
@@ -152,15 +154,20 @@ namespace Common
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
             var entry = default(TraceEntry);
-            if (state is TraceEntry e) { entry = e; }
+            if (state is TraceEntry e)
+            {
+                entry = e;
+                if (entry.Category == null) { entry.Category = this.Name; }
+            }
             else
             {
                 var startTicks = TraceLogger.Stopwatch.ElapsedTicks;
                 var type = typeof(InternalClass);
                 var caller = CodeSectionBase.Current.Value;
 
-                var classNameIndex = this.Name.LastIndexOf('.');
+                var classNameIndex = this.Name.LastIndexOf('.') + 1;
                 var source = classNameIndex >= 0 ? this.Name.Substring(0, classNameIndex) : this.Name;
+                if (source.EndsWith(".")) { source = source.TrimEnd('.'); }
                 var innerSectionScope = caller = caller != null ? caller.GetInnerSection() : new CodeSectionScope(this, this.Name, null, null, TraceLogger.TraceSource, SourceLevels.Verbose, LogLevel.Debug, this.Name, null, source, startTicks, "Unknown", null, -1, true) { IsInnerScope = true };
 
                 var stateFormatter = formatter != null ? formatter : (s, exc) => { return s.GetLogString(); };

@@ -92,6 +92,7 @@ namespace EasySample
                 {
                     // _logger.
                     _logger.LogTrace("this is a Trace trace", "event");
+                    _logger.LogDebug("this is a Trace trace");
                     _logger.LogDebug("this is a debug trace", "User", new Metrics() {
                         { "User", 123 },
                         { "Tags", new[] { "sample", "user", "advanced" } }

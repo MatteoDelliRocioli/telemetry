@@ -256,10 +256,7 @@ namespace Common
         public string FormatTraceEntry(TraceEntry entry, Exception ex)
         {
             var message = null as string;
-            var category = "general";
             var isLastWriteContinuation = false;
-
-            category = entry.Category;
 
             message = getEntryMessage(entry, lastWrite, out isLastWriteContinuation);
             message += Environment.NewLine;
