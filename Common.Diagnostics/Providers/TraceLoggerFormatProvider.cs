@@ -21,6 +21,7 @@ using System.Threading;
 
 namespace Common
 {
+    //[ConfigurationName("TraceLoggerFormat")]
     public class TraceLoggerFormatProvider : ILoggerProvider, IFormatTraceEntry
     {
         #region const
@@ -82,11 +83,13 @@ namespace Common
         public IList<ILogger> Listeners { get; } = new List<ILogger>();
         #endregion
 
+        #region .ctor
         public TraceLoggerFormatProvider() { }
         public TraceLoggerFormatProvider(IConfiguration configuration)
         {
             TraceLogger.InitConfiguration(configuration);
         }
+        #endregion
 
         public void AddProvider(ILoggerProvider provider)
         {
@@ -94,7 +97,9 @@ namespace Common
             {
                 if (string.IsNullOrEmpty(ConfigurationSuffix))
                 {
-                    var prefix = provider?.GetType()?.Name?.Split('.')?.Last();
+                    var providerType = this.GetType().Name != typeof(TraceLoggerFormatProvider).Name ? this.GetType() : provider?.GetType();
+                    //var prefix = providerType?.Name?.Split('.')?.Last();
+                    var prefix = ConfigurationHelper.GetConfigName(providerType);
                     this.ConfigurationSuffix = prefix;
                 }
 
@@ -194,6 +199,7 @@ namespace Common
 
             return logger;
         }
+
         public void Dispose()
         {
             ;
@@ -474,5 +480,45 @@ namespace Common
         {
             return sec.T != null ? sec.T?.Name : sec.ClassName;
         }
+    }
+
+    [ProviderAlias("DiginsightFormattedLog4Net")]
+    [ConfigurationName("DiginsightFormattedLog4Net")]
+    public class DiginsightFormattedLog4NetProvider : TraceLoggerFormatProvider
+    {
+        #region .ctor
+        public DiginsightFormattedLog4NetProvider() { }
+        public DiginsightFormattedLog4NetProvider(IConfiguration configuration) : base(configuration) { }
+        #endregion
+    }
+
+    [ProviderAlias("DiginsightFormattedApplicationInsights")]
+    [ConfigurationName("DiginsightFormattedApplicationInsights")]
+    public class DiginsightFormattedApplicationInsightsProvider : TraceLoggerFormatProvider
+    {
+        #region .ctor
+        public DiginsightFormattedApplicationInsightsProvider() { }
+        public DiginsightFormattedApplicationInsightsProvider(IConfiguration configuration) : base(configuration) { }
+        #endregion
+    }
+
+    [ProviderAlias("DiginsightFormattedConsole")]
+    [ConfigurationName("DiginsightFormattedConsole")]
+    public class DiginsightFormattedConsoleProvider : TraceLoggerFormatProvider
+    {
+        #region .ctor
+        public DiginsightFormattedConsoleProvider() { }
+        public DiginsightFormattedConsoleProvider(IConfiguration configuration) : base(configuration) { }
+        #endregion
+    }
+
+    [ProviderAlias("DiginsightFormattedDebug")]
+    [ConfigurationName("DiginsightFormattedDebug")]
+    public class DiginsightFormattedDebugProvider : TraceLoggerFormatProvider
+    {
+        #region .ctor
+        public DiginsightFormattedDebugProvider() { }
+        public DiginsightFormattedDebugProvider(IConfiguration configuration) : base(configuration) { }
+        #endregion
     }
 }

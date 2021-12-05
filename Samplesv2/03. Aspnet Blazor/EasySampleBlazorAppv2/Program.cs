@@ -59,7 +59,8 @@ namespace EasySampleBlazorAppv2
             
             var appinsightProvider = new ApplicationInsightsLoggerProvider(appInsights);
             //var appinsightJsonLoggerProvider = new TraceLoggerJsonProvider(builder.Configuration) { ConfigurationSuffix = "Appinsights" };
-            var appinsightFormatLoggerProvider = new TraceLoggerFormatProvider(builder.Configuration) { ConfigurationSuffix = "Appinsights" };
+            //var appinsightFormatLoggerProvider = new TraceLoggerFormatProvider(builder.Configuration) { ConfigurationSuffix = "Appinsights" };
+            var appinsightFormatLoggerProvider = new DiginsightFormattedApplicationInsightsProvider(builder.Configuration) { ConfigurationSuffix = "Appinsights" };
             appinsightFormatLoggerProvider.AddProvider(appinsightProvider);
             builder.Logging.AddProvider(appinsightFormatLoggerProvider); scope.LogDebug($"builder.Logging.AddProvider(appinsightFormatLoggerProvider);");
             builder.Services.AddSingleton<IApplicationInsights, ApplicationInsights>(sp => appInsights); scope.LogDebug($"builder.Services.AddSingleton<IApplicationInsights, ApplicationInsights>(sp => appInsights);");

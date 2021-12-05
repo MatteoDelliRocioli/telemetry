@@ -155,4 +155,45 @@ namespace Common
         int Min(int a, int b) { return a < b ? a : b; }
         #endregion
     }
+
+    [ProviderAlias("DiginsightJsonLog4Net")]
+    [ConfigurationName("DiginsightJsonLog4Net")]
+    public class DiginsightJsonLog4NetProvider : TraceLoggerJsonProvider
+    {
+        #region .ctor
+        public DiginsightJsonLog4NetProvider() { }
+        public DiginsightJsonLog4NetProvider(IConfiguration configuration) : base(configuration) { }
+        #endregion
+    }
+
+    [ProviderAlias("DiginsightJsonApplicationInsights")]
+    [ConfigurationName("DiginsightJsonApplicationInsights")]
+    public class DiginsightJsonApplicationInsightsProvider : TraceLoggerJsonProvider
+    {
+        #region .ctor
+        public DiginsightJsonApplicationInsightsProvider() { }
+        public DiginsightJsonApplicationInsightsProvider(IConfiguration configuration) : base(configuration) { }
+        #endregion
+    }
+
+    [ProviderAlias("DiginsightJsonConsole")]
+    [ConfigurationName("DiginsightJsonConsole")]
+    public class DiginsightJsonConsoleProvider : TraceLoggerJsonProvider
+    {
+        #region .ctor
+        public DiginsightJsonConsoleProvider() { }
+        public DiginsightJsonConsoleProvider(IConfiguration configuration) : base(configuration) { }
+        #endregion
+    }
+
+    [ProviderAlias("DiginsightJsonDebug")]
+    [ConfigurationName("DiginsightJsonDebug")]
+    public class DiginsightJsonDebugProvider : TraceLoggerJsonProvider
+    {
+        #region .ctor
+        public DiginsightJsonDebugProvider() { }
+        public DiginsightJsonDebugProvider(IConfiguration configuration) : base(configuration) { }
+        #endregion
+    }
+
 }

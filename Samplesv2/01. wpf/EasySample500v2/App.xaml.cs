@@ -87,13 +87,14 @@ namespace EasySample
                             var log4NetProvider = new Log4NetProvider(options);
                             loggingBuilder.AddDiginsightFormatted(log4NetProvider, configuration);
 
-                            //var telemetryConfiguration = new TelemetryConfiguration(appInsightKey);
-                            //var appinsightOptions = new ApplicationInsightsLoggerOptions();
-                            //var tco = Options.Create<TelemetryConfiguration>(telemetryConfiguration);
-                            //var aio = Options.Create<ApplicationInsightsLoggerOptions>(appinsightOptions);
+                            var telemetryConfiguration = new TelemetryConfiguration(appInsightKey);
+                            var appinsightOptions = new ApplicationInsightsLoggerOptions();
+                            var tco = Options.Create<TelemetryConfiguration>(telemetryConfiguration);
+                            var aio = Options.Create<ApplicationInsightsLoggerOptions>(appinsightOptions);
                             //loggingBuilder.AddDiginsightJson(new ApplicationInsightsLoggerProvider(tco, aio), configuration);
+                            loggingBuilder.AddDiginsightFormatted(new ApplicationInsightsLoggerProvider(tco, aio), configuration);
 
-                            //loggingBuilder.AddFilter<ApplicationInsightsLoggerProvider>("", LogLevel.Debug);
+                            loggingBuilder.AddFilter<ApplicationInsightsLoggerProvider>("", LogLevel.Debug);
                         }).Build();
 
                 Host.InitTraceLogger();
