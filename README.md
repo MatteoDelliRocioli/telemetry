@@ -2,11 +2,11 @@
 
 
 
-__Common.Diagnostics__ is a .Net Standard component that provides telemetry with __application execution flow__ to __.Net Log providers__ and DotNet __Systen Diagnostics listeners__.<br>
+__Common.Diagnostics__ is a .Net Standard component that provides telemetry with __application execution flow__ to __.Net Log providers__ and .Net __Systen Diagnostics listeners__.<br>
 <br>
 Basic execution flow is gathered by means of compiler generated information (eg. methodnames are obtained with `[CallerMemberName]` attribute).<br>
-Start and completion of code sections are gathered by means of `using` statements at the beginning of a method or a code section (eg. an async method callback) to create __Method or Named scopes__.<br>
-Traces are written to __standard .Net log providers__ or __System Diagnostic listeners__ so that applications can  keep using their diagnostics system and standard logs are integrated into the execution flow gathered by __Common.Diagnostics__.<br><br>
+Start and completion of code sections is gathered by means of `using` statements to create __Method or Named scopes__.<br>
+Traces are written to __standard .Net log providers__ or __System Diagnostic listeners__ so that applications can keep using their diagnostics system and standard logs are integrated into the execution flow gathered by __Common.Diagnostics__.<br><br>
 
 Common.Diagnostics is supported by __any .Net Framework version__ supporting .Net Standard 2.0, __any .Net Log provider__ and __any Sistem.Diagnostic listener__.<br><br>
 Examples are provided for __.NetCore 3.1+ and .Net Framework 4.6.2+ (including  .Net Framework 5.0)__ and __Blazor WebAssembly__.<br>
@@ -139,7 +139,7 @@ notice that the provider is added with the statement
 this adds the `Log4NetProvider` as the inner provider of a diginsight `TraceLoggerFormatProvider`.<br>
 `TraceLoggerFormatProvider` role is to receive trace entries, format sections start, sections end, keep track of the nesting level for the current thread and eventually format a string for the inner provider.
 
-the image below shows the TraceLoggerFormatProvider with an inner provider receiving traces from .net ILogger interfaces:
+The image below shows the TraceLoggerFormatProvider with an inner provider receiving traces from .net ILogger interfaces:
 ![alt text](/images/v2/01.5%20Diginsight%20TraceLoggerFormatProvider%20with%20nested%20provider.jpg "TraceLoggerFormatProvider with an inner provider receiving traces from .net ILogger interfaces").
 
 from now on it is just a metter of adding Method Scopes, named scopes and Trace statements to your code to get the real application flow.<br>
@@ -162,7 +162,7 @@ The following image shows the result of the preceding section, where prefix elli
 ![alt text](/images/v2/01.7%20Diginsight%20logging%20output.jpg "Trace output").
 
 
-## Tracing method parameters and variables and return values
+## Tracing method parameters, variables and return values
 When calling extensions methods `BeginMethodScope()` and `BeginNamedScope()` the method name is obtained by compiler generated information.<br>
 You can __provide method parameters__ to the application flow by means of an unnamed class in the __object payload parameter__.<br>
 At the same way you can describe __variable values__ using the LogDebug overload with the __object payload parameter__.
@@ -181,14 +181,14 @@ The following image shows an example configuration section that specifies differ
 
 ![alt text](/images/v2/01.10%20providers%20configuration.jpg "Trace output").
 
-We mentioned that the Application flow is obtained with a `TraceLoggerFormatProvider` with the real provider nested into it as an __inner provider__.<br>
+We mentioned that the application flow is obtained with a `TraceLoggerFormatProvider` with the real provider nested into it as an __inner provider__.<br>
 Aliases are defined for `TraceLoggerFormatProvider` to allow provider specific configuration of the trace level.<br>
 In the picture above we are using  `DiginsightFormattedLog4Net` to configure tracelevel when using Log4Net inner provider and `DiginsightFormattedApplicationInsights` to configure tracelevel when using ApplicationInsight inner provider.
 
 In particular, in the shown example, `Debug` level is specified for __Log4Net__ and `Information` level is specified for __ApplicationInsight__.
 
 __Additional configuration__ is available __at provider level__, to specify the exact information that should be rendered with the execution flow.
-As an example it is possible to Enable/disable rendering of the nesting level and the exact pieces of inforation that should be formatted into every trace line.
+As an example it is possible to enable/disable rendering of the nesting level and the exact pieces of inforation that should be formatted into every trace line.
 
 The following example specifies that the console provider used by a __blazor webassembly application__ should render the application flow without the trace source (the assembly name) to save space on the console window.<br>
 ![alt text](/images/v2/01.11%20providers%20configuration%20-%20additional.jpg "Trace output")<br>
@@ -263,8 +263,8 @@ The image below shows the EasySample where logstrings are provided for Window an
 -->
 
 # Performance considerations
-Rendering the application flow a there is a risc to impact application performance.
-for this reason when using diginsight it is important to follow normal guidelines of general good sense:
+Rendering the application flow there is a risc to impact application performance.
+For this reason when using diginsight it is important to follow normal guidelines of general good sense:
 
 - avoid using Method Scopes (and logging statements in general) on strict loops 
 - avoid using Method Scopes (and logging statements in general) on deeply recursive methods 
@@ -276,11 +276,11 @@ Diginsight telemetry takes some important precautions to avoid cluttering resour
 - use string.format() statement to compose log strings and avoid string.replace() and concatenation composing and formatting log strings
 - support a configurable limit for strings that are written to the log
   
-other strategies can be implemented in the future to further reduce perfomrance impact and still allow complete visibility of application flow for debugging, troubleshooting and reverse engineering purposes.
+other strategies can be implemented in the future to further control perfomrance impact and still allow complete visibility of application flow for debugging, troubleshooting and reverse engineering purposes.
 
 
 # Previous versions and support for System Diagnostics Trace Listeners
-Current version of Diginsight telemetry provide support for Both __.Net Log providers__ and DotNet __Systen Diagnostics listeners__. 
+Current version of Diginsight telemetry provide support for Both __.Net Log providers__ and DotNet __Systen Diagnostics listeners__.<br>
 The current document focused on using telemetry with __.Net Log providers__.<br><br>
 
 [README.V1.md](Readme.v1.md) describes how to use Diginsight telemetry with standard DotNet __Systen Diagnostics listeners__.
