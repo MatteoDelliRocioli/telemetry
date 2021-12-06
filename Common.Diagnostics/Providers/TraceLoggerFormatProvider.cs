@@ -93,7 +93,7 @@ namespace Common
 
         public void AddProvider(ILoggerProvider provider)
         {
-            using (var scope = TraceLogger.BeginMethodScope<TraceLoggerFormatProvider>())
+            using (var scope = TraceLogger.BeginMethodScope<TraceLoggerFormatProvider>(new { ConfigurationSuffix }))
             {
                 if (string.IsNullOrEmpty(ConfigurationSuffix))
                 {

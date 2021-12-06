@@ -47,6 +47,7 @@ namespace Common
             }
         }
     }
+
     public class TraceLoggerConsoleProvider : ILoggerProvider
     {
         public TraceLoggerConsoleProvider() { }

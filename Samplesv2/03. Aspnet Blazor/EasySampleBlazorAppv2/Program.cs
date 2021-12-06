@@ -37,7 +37,7 @@ namespace EasySampleBlazorAppv2
             builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging")); scope.LogDebug($"builder.Logging.AddConfiguration(builder.Configuration.GetSection('Logging'));");
 
             var consoleProvider = new TraceLoggerConsoleProvider();
-            var traceLoggerConsoleProvider = new TraceLoggerFormatProvider(builder.Configuration) { ConfigurationSuffix = "Console" };
+            var traceLoggerConsoleProvider = new TraceLoggerFormatProvider(builder.Configuration) { ConfigurationSuffix = "DiginsightFormattedConsole" };
             traceLoggerConsoleProvider.AddProvider(consoleProvider);
             builder.Logging.AddProvider(traceLoggerConsoleProvider); scope.LogDebug($"builder.Logging.AddProvider(traceLoggerConsoleProvider);");
 

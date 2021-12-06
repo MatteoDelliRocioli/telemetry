@@ -70,7 +70,7 @@ namespace Common
                 specificName = $"{assemblyName}.{className}.{name}";
                 sectionName = $"{className}.{name}";
                 groupName = $"{name}";
-                valueString = GetSetting<string>(specificName, null);
+                if (valueString == null) { valueString = GetSetting<string>(specificName, null); }
                 if (valueString == null) { valueString = GetSetting<string>(sectionName, null); }
                 if (valueString == null) { valueString = GetSetting<string>(groupName, null); }
                 if (valueString == null) { return ret; }
