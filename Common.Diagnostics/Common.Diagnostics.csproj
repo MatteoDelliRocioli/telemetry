@@ -12,7 +12,7 @@
 		<PackageTags>telemetry diginsight diagnostic insight</PackageTags>
 		<PackageIcon>TelemetryBig.png</PackageIcon>
 		<Authors>diginsight</Authors>
-		<Description>provides telemetry with the full application flow to System.Diagnostic listeners.</Description>
+		<Description>Common.Diagnostics is a .Net Standard component that provides telemetry with application execution flow to .Net Log providers and .Net Systen Diagnostics listeners</Description>
 		<SignAssembly>true</SignAssembly>
 		<AssemblyOriginatorKeyFile>diginsight.snk</AssemblyOriginatorKeyFile>
 		<UserSecretsId>ea6bafb2-fe5a-4acb-820e-78ff096f00c7</UserSecretsId>
