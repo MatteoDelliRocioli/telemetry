@@ -88,9 +88,9 @@ in this case log traces are added to the most inner scope, for the current threa
 # TELEMETRY PROVIDERS
 
 The image below shows an example of diginsight telemetry rendered to a log4net log provider for a wpf smart client application:
-![alt text](/images/v2/01.%20log4net%20trace.jpg "Diginsight telemetry to log4net log provider").
+![alt text](/images/v2/01.%20log4net%20trace.jpg "Diginsight telemetry to log4net log provider")
 
-The image below shows the result of rendering telemetry to the console of a web api on an azure kubernetes services container:
+Similarly, the image below shows the result of rendering telemetry to the console of a web api on an azure kubernetes services container:
 ![alt text](/images/v2/01.1%20aks%20console%20trace.jpg "Diginsight telemetry to a web api running on AKS container").
 
 an analogous result can be obtained rendering the application flow on the browser console log of a Blazor WebAssembly application:
@@ -137,10 +137,10 @@ notice that the provider is added with the statement
 		loggingBuilder.AddDiginsightFormatted(log4NetProvider, configuration);
 ```
 this adds the `Log4NetProvider` as the inner provider of a diginsight `TraceLoggerFormatProvider`.<br>
-`TraceLoggerFormatProvider` role is to receive trace entries, format sections start, sections end, keep track of the nesting level for the current thread and eventually format a string for the inner provider.
+`TraceLoggerFormatProvider` role is to receive trace entries, keep track of the nesting level for the current thread and eventually format a string for the inner provider.
 
 The image below shows the TraceLoggerFormatProvider with an inner provider receiving traces from .net ILogger interfaces:
-![alt text](/images/v2/01.5%20Diginsight%20TraceLoggerFormatProvider%20with%20nested%20provider.jpg "TraceLoggerFormatProvider with an inner provider receiving traces from .net ILogger interfaces").
+![alt text](/images/v2/01.5%20Diginsight%20TraceLoggerFormatProvider%20with%20nested%20provider.jpg "TraceLoggerFormatProvider with an inner provider receiving traces from .net ILogger interfaces")
 
 from now on it is just a metter of adding Method Scopes, named scopes and Trace statements to your code to get the real application flow.<br>
 
@@ -148,7 +148,7 @@ from now on it is just a metter of adding Method Scopes, named scopes and Trace 
 Just write a `using` statement with extensions methods `BeginMethodScope()` and `BeginNamedScope()` to obtain a method or a named __scope variable__.<br>
 You can write traces by means of the __scope variable__ or by means of __standard ILogger statements__ or __TraceLogger static methods__.
 
-![alt text](/images/v2/01.6%20Diginsight%20logging%20statements.jpg "Instrimenting code with diginsight").
+![alt text](/images/v2/01.6%20Diginsight%20logging%20statements.jpg "Instrimenting code with diginsight")
 
 For every scope variable, diginsight can keep track of the nesting level for the current thread.
 When __writing traces with the scope variable__ traces are written at the scope nesting level.
@@ -159,12 +159,12 @@ In this case, the log statement can be in a different method than the one where 
 To indicate this such traces are __prefixed with an ellipsis (...)__.
 
 The following image shows the result of the preceding section, where prefix ellipses are visible for traces from _logger variable or TraceLogger static methods:
-![alt text](/images/v2/01.7%20Diginsight%20logging%20output.jpg "Trace output").
+![alt text](/images/v2/01.7%20Diginsight%20logging%20output.jpg "Trace output")
 
 
 ## Tracing method parameters, variables and return values
 When calling extensions methods `BeginMethodScope()` and `BeginNamedScope()` the method name is obtained by compiler generated information.<br>
-You can __provide method parameters__ to the application flow by means of an unnamed class in the __object payload parameter__.<br>
+You can __provide method parameters__ to the application flow by means of an __unnamed class__ in the __object payload parameter__.<br>
 At the same way you can describe __variable values__ using the LogDebug overload with the __object payload parameter__.
 also the __return value of a method scope__ can be tracked by means of the `scope.Result` value:
 
@@ -274,7 +274,8 @@ Diginsight telemetry takes some important precautions to avoid cluttering resour
 - use compiler generated information and avoid use of reflection when gathering the application flow
 - gather application flow as pointers into TraceEntry structures and avoid composing and formatting log strings that are not used
 - use string.format() statement to compose log strings and avoid string.replace() and concatenation composing and formatting log strings
-- support a configurable limit for strings that are written to the log
+- support a configurable limit for the length of the strings that are written to the log<br>
+this ensures that when trying (inadvertitely) to log variables with large data all the data is rendered to the log. 
   
 other strategies can be implemented in the future to further control perfomrance impact and still allow complete visibility of application flow for debugging, troubleshooting and reverse engineering purposes.
 
