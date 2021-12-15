@@ -118,8 +118,6 @@ stages:
     - powershell: |
         echo "computedValues.versionSuffix: '$(computedValues.versionSuffix)'"
         echo "computedValues.version: '$(computedValues.version)'"
-        # echo "varialbeGroupUrl: '$(varialbeGroupUrl)'"
-        # echo "varialbeGroupUrlEnc: '$(varialbeGroupUrlEnc)'"
         ".\scripts\v1\00. DumpVariables.ps1"
       name: computedValuesPrint 
       displayName: Dump computed values
@@ -132,45 +130,6 @@ stages:
       displayName: SetAssemblyVersion
       enabled: true
       continueOnError: true
-
-    # - task: PowerShell@2
-    #   inputs:
-    #     filePath: '.\scripts\02. IncrementAssemblyVersion.ps1'
-    #     arguments: '-masterProjectBaseName ''$(commonDiagnosticBaseName)'' -projectBaseNames ''$(buildBaseNames)'' ' 
-    #   name: psIncrementAssemblyVersion
-    #   displayName: IncrementAssemblyVersion
-    #   enabled: true
-    #   continueOnError: true
-
-    # - powershell: |
-    #     Write-Host "version: '$(version)'"
-    #     Write-Host "psIncrementAssemblyVersion.version '$(psIncrementAssemblyVersion.version)'"
-    #     $version = $(psIncrementAssemblyVersion.version)
-    #     Write-Host "version: '$(version)'"
-    #     ".\scripts\00. DumpVariables.ps1"
-    #   name: readVersion
-    #   displayName: Read Versions
-    #   continueOnError: true
-
-    # - bash: |
-    #     curl -fL -XPUT -H "Authorization:Bearer $(System.AccessToken)" -H "Content-Type:application/json" \
-    #     -d '{
-    #       "id": "$(versionGroupId)",
-    #       "type": "Vsts",
-    #       "name": "versionGroup",
-    #       "variables": {
-    #         "versionGroupId": {
-    #           "isSecret": false,
-    #           "value": "$(versionGroupId)"
-    #         },
-    #         "version": {
-    #           "isSecret": false,
-    #           "value": "$(psIncrementAssemblyVersion.version)"
-    #         }
-    #       }
-    #     }' \
-    #     $(System.TeamFoundationCollectionUri)/$(System.TeamProject)/_apis/distributedtask/variablegroups/$(versionGroupId)?api-version=5.0-preview.1
-    #   displayName: 'Set variable in variable group to current $(psIncrementAssemblyVersion.version)'
 
     - powershell: |
         echo "version: '$(version)'"
@@ -225,7 +184,6 @@ stages:
     - powershell: |
         echo "computedValues.version: '$(computedValues.version)'"
         echo "computedValues.versionSuffix: '$(computedValues.versionSuffix)'"
-        echo "varialbeGroupUrlEnc: '$(varialbeGroupUrlEnc)'"
         ".\scripts\v1\00. DumpVariables.ps1"
       name: computedValuesPrint 
       displayName: Dump computed values
@@ -343,14 +301,14 @@ stages:
 
           - task: PowerShell@2
             inputs:
-              filePath: '.\scripts\00. DumpVariables.ps1'
+              filePath: '.\scripts\v1\00. DumpVariables.ps1'
             name: psDumpVariables1
             displayName: DumpVariables
             enabled: true
 
           - powershell: |
               Write-Host "version: '$(version)'"
-              '.\scripts\00. DumpVariables.ps1'
+              '.\scripts\v1\00. DumpVariables.ps1'
             name: copyVersionVariable
             displayName: Copy Output variables (version)
             continueOnError: true
@@ -405,14 +363,14 @@ stages:
 
           - task: PowerShell@2
             inputs:
-              filePath: '.\scripts\00. DumpVariables.ps1'
+              filePath: '.\scripts\v1\00. DumpVariables.ps1'
             name: psDumpVariables2
             displayName: DumpVariables
             enabled: true
 
           - powershell: |
               Write-Host "version: '$(version)'"
-              '.\scripts\00. DumpVariables.ps1'
+              '.\scripts\v1\00. DumpVariables.ps1'
             name: copyVersionVariable2
             displayName: Copy Output Variables ('version')
             continueOnError: true
@@ -420,7 +378,7 @@ stages:
           - task: AzurePowerShell@5
             inputs:
               ScriptType: 'FilePath'
-              ScriptPath: '.\scripts\06. Copy2AzureStorage.ps1'
+              ScriptPath: '.\scripts\v1\06. Copy2AzureStorage.ps1'
               ScriptArguments: '-connectionString ''$(ConnectionStringDevdgwsamplesstorage)'' -sourceFolder $(packagesFolder) -azureShare ''$(azureShare)'' -rootDir ''$(rootDir)'' -version ''$(version)'''
               azureSubscription: 'Microsoft Azure Internal Consumption(6c310049-95d6-4647-b55a-08f668920781)'
               azurePowerShellVersion: 'LatestVersion'
@@ -432,7 +390,7 @@ stages:
 
             # - task: PowerShell@2
             #   inputs:
-            #     filePath: '.\scripts\06. Copy2AzureStorage.ps1'
+            #     filePath: '.\scripts\v1\06. Copy2AzureStorage.ps1'
             #     arguments: "-connectionString '$(connectionString)' -sourceFolder $(packagesFolder)\$(buildConfiguration) -azureShare '$(azureShare)' -rootDir '$(rootDir)' -version '$(version)'"
             #   name: psCopy2AzureStorage
             #   env:
