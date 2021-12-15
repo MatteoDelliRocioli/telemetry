@@ -301,14 +301,14 @@ stages:
 
           - task: PowerShell@2
             inputs:
-              filePath: '.\scripts\00. DumpVariables.ps1'
+              filePath: '.\scripts\v1\00. DumpVariables.ps1'
             name: psDumpVariables1
             displayName: DumpVariables
             enabled: true
 
           - powershell: |
               Write-Host "version: '$(version)'"
-              '.\scripts\00. DumpVariables.ps1'
+              '.\scripts\v1\00. DumpVariables.ps1'
             name: copyVersionVariable
             displayName: Copy Output variables (version)
             continueOnError: true
@@ -363,14 +363,14 @@ stages:
 
           - task: PowerShell@2
             inputs:
-              filePath: '.\scripts\00. DumpVariables.ps1'
+              filePath: '.\scripts\v1\00. DumpVariables.ps1'
             name: psDumpVariables2
             displayName: DumpVariables
             enabled: true
 
           - powershell: |
               Write-Host "version: '$(version)'"
-              '.\scripts\00. DumpVariables.ps1'
+              '.\scripts\v1\00. DumpVariables.ps1'
             name: copyVersionVariable2
             displayName: Copy Output Variables ('version')
             continueOnError: true
@@ -378,7 +378,7 @@ stages:
           - task: AzurePowerShell@5
             inputs:
               ScriptType: 'FilePath'
-              ScriptPath: '.\scripts\06. Copy2AzureStorage.ps1'
+              ScriptPath: '.\scripts\v1\06. Copy2AzureStorage.ps1'
               ScriptArguments: '-connectionString ''$(ConnectionStringDevdgwsamplesstorage)'' -sourceFolder $(packagesFolder) -azureShare ''$(azureShare)'' -rootDir ''$(rootDir)'' -version ''$(version)'''
               azureSubscription: 'Microsoft Azure Internal Consumption(6c310049-95d6-4647-b55a-08f668920781)'
               azurePowerShellVersion: 'LatestVersion'
@@ -390,7 +390,7 @@ stages:
 
             # - task: PowerShell@2
             #   inputs:
-            #     filePath: '.\scripts\06. Copy2AzureStorage.ps1'
+            #     filePath: '.\scripts\v1\06. Copy2AzureStorage.ps1'
             #     arguments: "-connectionString '$(connectionString)' -sourceFolder $(packagesFolder)\$(buildConfiguration) -azureShare '$(azureShare)' -rootDir '$(rootDir)' -version '$(version)'"
             #   name: psCopy2AzureStorage
             #   env:
