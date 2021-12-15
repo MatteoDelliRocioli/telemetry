@@ -131,45 +131,6 @@ stages:
       enabled: true
       continueOnError: true
 
-    # - task: PowerShell@2
-    #   inputs:
-    #     filePath: '.\scripts\02. IncrementAssemblyVersion.ps1'
-    #     arguments: '-masterProjectBaseName ''$(commonDiagnosticBaseName)'' -projectBaseNames ''$(buildBaseNames)'' ' 
-    #   name: psIncrementAssemblyVersion
-    #   displayName: IncrementAssemblyVersion
-    #   enabled: true
-    #   continueOnError: true
-
-    # - powershell: |
-    #     Write-Host "version: '$(version)'"
-    #     Write-Host "psIncrementAssemblyVersion.version '$(psIncrementAssemblyVersion.version)'"
-    #     $version = $(psIncrementAssemblyVersion.version)
-    #     Write-Host "version: '$(version)'"
-    #     ".\scripts\00. DumpVariables.ps1"
-    #   name: readVersion
-    #   displayName: Read Versions
-    #   continueOnError: true
-
-    # - bash: |
-    #     curl -fL -XPUT -H "Authorization:Bearer $(System.AccessToken)" -H "Content-Type:application/json" \
-    #     -d '{
-    #       "id": "$(versionGroupId)",
-    #       "type": "Vsts",
-    #       "name": "versionGroup",
-    #       "variables": {
-    #         "versionGroupId": {
-    #           "isSecret": false,
-    #           "value": "$(versionGroupId)"
-    #         },
-    #         "version": {
-    #           "isSecret": false,
-    #           "value": "$(psIncrementAssemblyVersion.version)"
-    #         }
-    #       }
-    #     }' \
-    #     $(System.TeamFoundationCollectionUri)/$(System.TeamProject)/_apis/distributedtask/variablegroups/$(versionGroupId)?api-version=5.0-preview.1
-    #   displayName: 'Set variable in variable group to current $(psIncrementAssemblyVersion.version)'
-
     - powershell: |
         echo "version: '$(version)'"
         echo "computedValues.version '$(computedValues.version)'"
