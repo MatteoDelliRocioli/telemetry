@@ -58,6 +58,7 @@ variables:
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release' #Debug,
   publishBaseNames: '$(commonDiagnosticBaseName)|$(commonDiagnosticv2BaseName)|$(commonDiagnosticWinBaseName)|$(commonDiagnosticSerilogBaseName)|$(commonDiagnosticLog4netBaseName)|$(commonDiagnosticAppinsightsBaseName)' 
+  buildProjectFiles: '$(commonDiagnosticBaseName).csproj|$(commonDiagnosticCoreBaseName).csproj|$(commonDiagnosticFullBaseName).csproj|$(commonDiagnosticWinBaseName).csproj|$(commonDiagnosticSerilogBaseName).csproj|$(commonDiagnosticLog4netBaseName).csproj|$(commonDiagnosticAppinsightsBaseName).csproj' 
   publishNupkgFilter: |
     **\bin\$(buildConfiguration)\**\*.$(version).nupkg
     !**\bin\$(buildConfiguration)\**\Common.Diagnostics.Core.$(version).nupkg
@@ -119,57 +120,70 @@ stages:
         echo "computedValues.version: '$(computedValues.version)'"
         # echo "varialbeGroupUrl: '$(varialbeGroupUrl)'"
         # echo "varialbeGroupUrlEnc: '$(varialbeGroupUrlEnc)'"
-        ".\scripts\00. DumpVariables.ps1"
+        ".\scripts\v1\00. DumpVariables.ps1"
       name: computedValuesPrint 
       displayName: Dump computed values
 
     - task: PowerShell@2
       inputs:
-        filePath: '.\scripts\02. IncrementAssemblyVersion.ps1'
-        arguments: '-masterProjectBaseName ''$(commonDiagnosticBaseName)'' -projectBaseNames ''$(buildBaseNames)'' ' 
-      name: psIncrementAssemblyVersion
-      displayName: IncrementAssemblyVersion
+        filePath: '.\scripts\v1\01.1 SetAssemblyVersion.ps1'
+        arguments: '-projectsFiles ''$(buildProjectFiles)'' -filterPattern '''' -version ''$(computedValues.version)'' ' 
+      name: psSetAssemblyVersion
+      displayName: SetAssemblyVersion
       enabled: true
       continueOnError: true
 
-    - powershell: |
-        Write-Host "version: '$(version)'"
-        Write-Host "psIncrementAssemblyVersion.version '$(psIncrementAssemblyVersion.version)'"
-        $version = $(psIncrementAssemblyVersion.version)
-        Write-Host "version: '$(version)'"
-        ".\scripts\00. DumpVariables.ps1"
-      name: readVersion
-      displayName: Read Versions
-      continueOnError: true
+    # - task: PowerShell@2
+    #   inputs:
+    #     filePath: '.\scripts\02. IncrementAssemblyVersion.ps1'
+    #     arguments: '-masterProjectBaseName ''$(commonDiagnosticBaseName)'' -projectBaseNames ''$(buildBaseNames)'' ' 
+    #   name: psIncrementAssemblyVersion
+    #   displayName: IncrementAssemblyVersion
+    #   enabled: true
+    #   continueOnError: true
 
-    - bash: |
-        curl -fL -XPUT -H "Authorization:Bearer $(System.AccessToken)" -H "Content-Type:application/json" \
-        -d '{
-          "id": "$(versionGroupId)",
-          "type": "Vsts",
-          "name": "versionGroup",
-          "variables": {
-            "versionGroupId": {
-              "isSecret": false,
-              "value": "$(versionGroupId)"
-            },
-            "version": {
-              "isSecret": false,
-              "value": "$(psIncrementAssemblyVersion.version)"
-            }
-          }
-        }' \
-        $(System.TeamFoundationCollectionUri)/$(System.TeamProject)/_apis/distributedtask/variablegroups/$(versionGroupId)?api-version=5.0-preview.1
-      displayName: 'Set variable in variable group to current $(psIncrementAssemblyVersion.version)'
+    # - powershell: |
+    #     Write-Host "version: '$(version)'"
+    #     Write-Host "psIncrementAssemblyVersion.version '$(psIncrementAssemblyVersion.version)'"
+    #     $version = $(psIncrementAssemblyVersion.version)
+    #     Write-Host "version: '$(version)'"
+    #     ".\scripts\00. DumpVariables.ps1"
+    #   name: readVersion
+    #   displayName: Read Versions
+    #   continueOnError: true
+
+    # - bash: |
+    #     curl -fL -XPUT -H "Authorization:Bearer $(System.AccessToken)" -H "Content-Type:application/json" \
+    #     -d '{
+    #       "id": "$(versionGroupId)",
+    #       "type": "Vsts",
+    #       "name": "versionGroup",
+    #       "variables": {
+    #         "versionGroupId": {
+    #           "isSecret": false,
+    #           "value": "$(versionGroupId)"
+    #         },
+    #         "version": {
+    #           "isSecret": false,
+    #           "value": "$(psIncrementAssemblyVersion.version)"
+    #         }
+    #       }
+    #     }' \
+    #     $(System.TeamFoundationCollectionUri)/$(System.TeamProject)/_apis/distributedtask/variablegroups/$(versionGroupId)?api-version=5.0-preview.1
+    #   displayName: 'Set variable in variable group to current $(psIncrementAssemblyVersion.version)'
 
     - powershell: |
-        Write-Host "version: '$(version)'"
-        Write-Host "psIncrementAssemblyVersion.version '$(psIncrementAssemblyVersion.version)'"
-        $version = $(psIncrementAssemblyVersion.version)
-        Write-Host "version: '$(version)'"
+        echo "version: '$(version)'"
+        echo "computedValues.version '$(computedValues.version)'"
       name: readVersion1
       displayName: Read Versions
       continueOnError: true
+    - task: PowerShell@2
+      inputs:
+        filePath: '.\scripts\v1\01.9 CommitChanges.ps1'
+      name: psCommitChanges
+      displayName: CommitChanges
+      enabled: true
 
   - job: Build_Assemblies
     dependsOn: Increment_Version
@@ -184,27 +198,53 @@ stages:
           buildConfiguration: 'Release'
     workspace: 
       clean: outputs
+    variables:
+    - name: targetVersion
+      value: $[dependencies.Increment_Version.outputs['computedValues.version']]
+      readonly: true
+    
     steps:
-    - powershell: |
-        Write-Host "version: '$(version)'"
-      name: readVersion2
-      displayName: Read Versions
-      continueOnError: true
-
     - task: PowerShell@2
       inputs:
-        filePath: '.\scripts\00. DumpVariables.ps1'
-      name: psDumpVariables0
+        filePath: '.\scripts\v1\00. DumpVariables.ps1'
+      name: psDumpVariables
       displayName: DumpVariables
       enabled: true
 
+    - powershell: |
+        $versionSuffix = "$(buildConfiguration)" 
+        $versionSuffix = $versionSuffix -replace "Debug", ".D"  
+        $versionSuffix = $versionSuffix -replace "Release", ".R"  
+        echo "versionSuffix: '$versionSuffix'"
+        echo "##vso[task.setvariable variable=versionSuffix;isOutput=true]$versionSuffix"
+        Write-Host "version: '$version', targetVersion: '$(targetVersion)'"
+        echo "##vso[task.setvariable variable=version;isOutput=true]$targetVersion"
+      name: computedValues 
+      displayName: Compute runtime values
+
+    - powershell: |
+        echo "computedValues.version: '$(computedValues.version)'"
+        echo "computedValues.versionSuffix: '$(computedValues.versionSuffix)'"
+        echo "varialbeGroupUrlEnc: '$(varialbeGroupUrlEnc)'"
+        ".\scripts\v1\00. DumpVariables.ps1"
+      name: computedValuesPrint 
+      displayName: Dump computed values
+
     - task: PowerShell@2
       inputs:
-        filePath: '.\scripts\02.1. IncrementAssemblyVersion.ps1'
-      name: psIncrementAssemblyVersion
-      displayName: IncrementAssemblyVersion
+        filePath: '.\scripts\v1\01.1 SetAssemblyVersion.ps1'
+        arguments: '-projectsFiles ''$(buildProjectFiles)'' -filterPattern '''' -version ''$(computedValues.version)'' ' 
+      name: psSetAssemblyVersion
+      displayName: SetAssemblyVersion
       enabled: true
       continueOnError: true
+
+    - task: PowerShell@2
+      inputs:
+        filePath: '.\scripts\v1\00. DumpVariables.ps1'
+      name: psDumpVariables0
+      displayName: DumpVariables
+      enabled: true
 
     - task: NuGetToolInstaller@1
       displayName: Install NuGet tool
