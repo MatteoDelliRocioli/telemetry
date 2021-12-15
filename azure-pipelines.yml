@@ -1,5 +1,7 @@
+#########################################################################
 # .NET Desktop
 # https://docs.microsoft.com/azure/devops/pipelines/apps/windows/dot-net
+#########################################################################
  
 trigger:
   batch: true
@@ -84,10 +86,43 @@ stages:
 
     - task: PowerShell@2
       inputs:
-        filePath: '.\scripts\00. DumpVariables.ps1'
+        filePath: '.\scripts\v1\00. DumpVariables.ps1'
       name: psDumpVariables
       displayName: DumpVariables
       enabled: true
+
+    - task: PowerShell@2
+      inputs:
+        filePath: '.\scripts\v1\01. GetAssemblyVersion.ps1'
+        arguments: '-projectFile ''$(commonDiagnosticProj)'' ' 
+      name: psGetAssemblyVersion
+      displayName: GetAssemblyVersion
+      enabled: true
+      continueOnError: true
+
+    - powershell: |
+        $versionSuffix = "$(buildConfiguration)" 
+        $versionSuffix = $versionSuffix -replace "Debug", ".D"  
+        $versionSuffix = $versionSuffix -replace "Release", ".R"  
+        echo "versionSuffix: '$versionSuffix'"
+        echo "##vso[task.setvariable variable=versionSuffix;isOutput=true]$versionSuffix"
+
+        $version = [version]"$(psGetAssemblyVersion.version)"
+        $newVersion = "{0}.{1}.{2}.{3}" -f $version.Major, $version.Minor, $version.Build, ($version.Revision + 1)
+        Write-Host "version: '$version', newVersion: '$newVersion'"
+        echo "##vso[task.setvariable variable=version;isOutput=true]$newVersion"
+      name: computedValues 
+      displayName: Compute runtime values
+
+    - powershell: |
+        echo "computedValues.versionSuffix: '$(computedValues.versionSuffix)'"
+        echo "computedValues.version: '$(computedValues.version)'"
+        # echo "varialbeGroupUrl: '$(varialbeGroupUrl)'"
+        # echo "varialbeGroupUrlEnc: '$(varialbeGroupUrlEnc)'"
+        ".\scripts\00. DumpVariables.ps1"
+      name: computedValuesPrint 
+      displayName: Dump computed values
+
 
     - task: PowerShell@2
       inputs:
