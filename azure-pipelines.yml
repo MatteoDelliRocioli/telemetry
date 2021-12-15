@@ -172,12 +172,12 @@ stages:
         echo "##vso[task.setvariable variable=versionSuffix;isOutput=true]$versionSuffix"
         Write-Host "version: '$version', targetVersion: '$(targetVersion)'"
         echo "##vso[task.setvariable variable=version;isOutput=true]$(targetVersion)"
-      name: computedValues1
+      name: computedValues
       displayName: Compute runtime values
 
     - powershell: |
-        echo "computedValues1.version: '$(computedValues1.version)'"
-        echo "computedValues1.versionSuffix: '$(computedValues1.versionSuffix)'"
+        echo "computedValues.version: '$(computedValues.version)'"
+        echo "computedValues.versionSuffix: '$(computedValues.versionSuffix)'"
         ".\scripts\v1\00. DumpVariables.ps1"
       name: computedValuesPrint 
       displayName: Dump computed values
@@ -185,7 +185,7 @@ stages:
     - task: PowerShell@2
       inputs:
         filePath: '.\scripts\v1\01.1 SetAssemblyVersion.ps1'
-        arguments: '-projectsFiles ''$(buildProjectFiles)'' -filterPattern '''' -version ''$(computedValues1.version)'' ' 
+        arguments: '-projectsFiles ''$(buildProjectFiles)'' -filterPattern '''' -version ''$(computedValues.version)'' ' 
       name: psSetAssemblyVersion
       displayName: SetAssemblyVersion
       enabled: true
