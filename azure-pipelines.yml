@@ -31,6 +31,7 @@ pool:
 name: $(date:yyyy).$(date:MM).$(date:dd)$(rev:.r)
 
 variables: 
+  version: ''
   solutionsFilter: '*.sln'
   projectsFilter: '*.csproj'
   projectBaseName: Common.Diagnostics
@@ -64,7 +65,7 @@ variables:
     !**\bin\$(buildConfiguration)\**\Common.Diagnostics.Core.$(version).nupkg
     !**\bin\$(buildConfiguration)\**\Common.Diagnostics.Full.$(version).nupkg
 
-  stageVariables: 'version'
+  # stageVariables: 'version'
 
 stages:
 - stage: Build_Assemblies
