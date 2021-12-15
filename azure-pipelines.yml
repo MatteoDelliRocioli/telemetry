@@ -118,8 +118,6 @@ stages:
     - powershell: |
         echo "computedValues.versionSuffix: '$(computedValues.versionSuffix)'"
         echo "computedValues.version: '$(computedValues.version)'"
-        # echo "varialbeGroupUrl: '$(varialbeGroupUrl)'"
-        # echo "varialbeGroupUrlEnc: '$(varialbeGroupUrlEnc)'"
         ".\scripts\v1\00. DumpVariables.ps1"
       name: computedValuesPrint 
       displayName: Dump computed values
@@ -225,7 +223,6 @@ stages:
     - powershell: |
         echo "computedValues.version: '$(computedValues.version)'"
         echo "computedValues.versionSuffix: '$(computedValues.versionSuffix)'"
-        echo "varialbeGroupUrlEnc: '$(varialbeGroupUrlEnc)'"
         ".\scripts\v1\00. DumpVariables.ps1"
       name: computedValuesPrint 
       displayName: Dump computed values
