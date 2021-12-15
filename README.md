@@ -139,7 +139,7 @@ notice that the provider is added with the statement
 this adds the `Log4NetProvider` as the inner provider of a diginsight `TraceLoggerFormatProvider`.<br>
 `TraceLoggerFormatProvider` role is to receive trace entries, keep track of the nesting level for the current thread and eventually format a string for the inner provider.
 
-The image below shows the TraceLoggerFormatProvider with an inner provider receiving traces from .net ILogger interfaces:
+The image below shows the `TraceLoggerFormatProvider` receiving trace entries from .net ILogger interfaces and formatting them for an inner provider:
 ![alt text](/images/v2/01.5%20Diginsight%20TraceLoggerFormatProvider%20with%20nested%20provider.jpg "TraceLoggerFormatProvider with an inner provider receiving traces from .net ILogger interfaces")
 
 from now on it is just a metter of adding Method Scopes, named scopes and Trace statements to your code to get the real application flow.<br>
