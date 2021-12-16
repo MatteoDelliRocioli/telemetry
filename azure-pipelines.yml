@@ -51,11 +51,11 @@ variables:
   commonDiagnosticSerilogProj: ./$(commonDiagnosticSerilogBaseName)/$(commonDiagnosticSerilogBaseName).csproj
   commonDiagnosticLog4netProj: ./$(commonDiagnosticLog4netBaseName)/$(commonDiagnosticLog4netBaseName).csproj
   commonDiagnosticAppinsightsProj: ./$(commonDiagnosticAppinsightsBaseName)/$(commonDiagnosticAppinsightsBaseName).csproj
-  allProjects: '**/@($(commonDiagnosticProj)|$(commonDiagnosticv2Proj)|$(commonDiagnosticCoreProj)|$(commonDiagnosticFullProj)|$(commonDiagnosticWinProj)|$(commonDiagnosticSerilogProj)|$(commonDiagnosticLog4netProj)|$(commonDiagnosticAppinsightsProj))' 
-  buildBaseNames: '$(commonDiagnosticBaseName)|$(commonDiagnosticv2BaseName)|$(commonDiagnosticCoreBaseName)|$(commonDiagnosticFullBaseName)|$(commonDiagnosticWinBaseName)|$(commonDiagnosticSerilogBaseName)|$(commonDiagnosticLog4netBaseName)|$(commonDiagnosticAppinsightsBaseName)' 
+  allProjects: '**/@($(commonDiagnosticProj)|$(commonDiagnosticCoreProj)|$(commonDiagnosticFullProj)|$(commonDiagnosticWinProj)|$(commonDiagnosticSerilogProj)|$(commonDiagnosticLog4netProj)|$(commonDiagnosticAppinsightsProj))' 
+  buildBaseNames: '$(commonDiagnosticBaseName)|$(commonDiagnosticCoreBaseName)|$(commonDiagnosticFullBaseName)|$(commonDiagnosticWinBaseName)|$(commonDiagnosticSerilogBaseName)|$(commonDiagnosticLog4netBaseName)|$(commonDiagnosticAppinsightsBaseName)' 
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release' #Debug,
-  publishBaseNames: '$(commonDiagnosticBaseName)|$(commonDiagnosticv2BaseName)|$(commonDiagnosticWinBaseName)|$(commonDiagnosticSerilogBaseName)|$(commonDiagnosticLog4netBaseName)|$(commonDiagnosticAppinsightsBaseName)' 
+  publishBaseNames: '$(commonDiagnosticBaseName)|$(commonDiagnosticWinBaseName)|$(commonDiagnosticSerilogBaseName)|$(commonDiagnosticLog4netBaseName)|$(commonDiagnosticAppinsightsBaseName)' 
   publishNupkgFilter: |
     **\bin\$(buildConfiguration)\**\*.$(version).nupkg
     !**\bin\$(buildConfiguration)\**\Common.Diagnostics.Core.$(version).nupkg
