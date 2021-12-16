@@ -333,18 +333,18 @@ stages:
             name: computedValuesPrint 
             displayName: Dump computed values
 
-          - powershell: |
-              Write-Host "version: '$(version)'"
-              '.\scripts\v1\00. DumpVariables.ps1'
-            name: copyVersionVariable
-            displayName: Copy Output variables (version)
-            continueOnError: true
+          # - powershell: |
+          #     Write-Host "version: '$(version)'"
+          #     '.\scripts\v1\00. DumpVariables.ps1'
+          #   name: copyVersionVariable
+          #   displayName: Copy Output variables (version)
+          #   continueOnError: true
 
           - task: NuGetCommand@2
             displayName: Nuget push from 'packages' folder to 'Common.Diagnostics' feed
             inputs:
               command: 'push'
-              packagesToPush: '..\packages\$(buildConfiguration)\*.$(version).nupkg'
+              packagesToPush: '..\packages\$(buildConfiguration)\*.$(computedValues.version).nupkg'
               nuGetFeedType: 'internal'
               publishVstsFeed: $(artifactsFeed)
               allowPackageConflicts: true
@@ -352,7 +352,7 @@ stages:
           - task: NuGetCommand@2
             inputs:
               command: 'push'
-              packagesToPush: '..\packages\$(buildConfiguration)\*.$(version).nupkg'
+              packagesToPush: '..\packages\$(buildConfiguration)\*.$(computedValues.version).nupkg'
               nuGetFeedType: 'external'
               publishFeedCredentials: 'diginsight telemetry'
 
@@ -413,18 +413,18 @@ stages:
             displayName: DumpVariables
             enabled: true
 
-          - powershell: |
-              Write-Host "version: '$(version)'"
-              '.\scripts\v1\00. DumpVariables.ps1'
-            name: copyVersionVariable2
-            displayName: Copy Output Variables ('version')
-            continueOnError: true
+          # - powershell: |
+          #     Write-Host "version: '$(version)'"
+          #     '.\scripts\v1\00. DumpVariables.ps1'
+          #   name: copyVersionVariable2
+          #   displayName: Copy Output Variables ('version')
+          #   continueOnError: true
 
           - task: AzurePowerShell@5
             inputs:
               ScriptType: 'FilePath'
               ScriptPath: '.\scripts\v1\06. Copy2AzureStorage.ps1'
-              ScriptArguments: '-connectionString ''$(ConnectionStringDevdgwsamplesstorage)'' -sourceFolder $(packagesFolder) -azureShare ''$(azureShare)'' -rootDir ''$(rootDir)'' -version ''$(version)'''
+              ScriptArguments: '-connectionString ''$(ConnectionStringDevdgwsamplesstorage)'' -sourceFolder $(packagesFolder) -azureShare ''$(azureShare)'' -rootDir ''$(rootDir)'' -version ''$(computedValues.version)'''
               azureSubscription: 'Microsoft Azure Internal Consumption(6c310049-95d6-4647-b55a-08f668920781)'
               azurePowerShellVersion: 'LatestVersion'
             name: psCopy2AzureStorageDebug
@@ -436,7 +436,7 @@ stages:
             # - task: PowerShell@2
             #   inputs:
             #     filePath: '.\scripts\06. Copy2AzureStorage.ps1'
-            #     arguments: "-connectionString '$(connectionString)' -sourceFolder $(packagesFolder)\$(buildConfiguration) -azureShare '$(azureShare)' -rootDir '$(rootDir)' -version '$(version)'"
+            #     arguments: "-connectionString '$(connectionString)' -sourceFolder $(packagesFolder)\$(buildConfiguration) -azureShare '$(azureShare)' -rootDir '$(rootDir)' -version '$(computedValues.version)'"
             #   name: psCopy2AzureStorage
             #   env:
             #     connectionString: $(connectionString)
