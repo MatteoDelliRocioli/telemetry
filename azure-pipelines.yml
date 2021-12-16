@@ -31,6 +31,7 @@ pool:
 name: $(date:yyyy).$(date:MM).$(date:dd)$(rev:.r)
 
 variables: 
+  version: ''
   solutionsFilter: '*.sln'
   projectsFilter: '*.csproj'
   projectBaseName: Common.Diagnostics
@@ -53,18 +54,18 @@ variables:
   commonDiagnosticSerilogProj: ./$(commonDiagnosticSerilogBaseName)/$(commonDiagnosticSerilogBaseName).csproj
   commonDiagnosticLog4netProj: ./$(commonDiagnosticLog4netBaseName)/$(commonDiagnosticLog4netBaseName).csproj
   commonDiagnosticAppinsightsProj: ./$(commonDiagnosticAppinsightsBaseName)/$(commonDiagnosticAppinsightsBaseName).csproj
-  allProjects: '**/@($(commonDiagnosticProj)|$(commonDiagnosticv2Proj)|$(commonDiagnosticCoreProj)|$(commonDiagnosticFullProj)|$(commonDiagnosticWinProj)|$(commonDiagnosticSerilogProj)|$(commonDiagnosticLog4netProj)|$(commonDiagnosticAppinsightsProj))' 
-  buildBaseNames: '$(commonDiagnosticBaseName)|$(commonDiagnosticv2BaseName)|$(commonDiagnosticCoreBaseName)|$(commonDiagnosticFullBaseName)|$(commonDiagnosticWinBaseName)|$(commonDiagnosticSerilogBaseName)|$(commonDiagnosticLog4netBaseName)|$(commonDiagnosticAppinsightsBaseName)' 
+  allProjects: '**/@($(commonDiagnosticProj)|$(commonDiagnosticCoreProj)|$(commonDiagnosticFullProj)|$(commonDiagnosticWinProj)|$(commonDiagnosticSerilogProj)|$(commonDiagnosticLog4netProj)|$(commonDiagnosticAppinsightsProj))' 
+  buildBaseNames: '$(commonDiagnosticBaseName)|$(commonDiagnosticCoreBaseName)|$(commonDiagnosticFullBaseName)|$(commonDiagnosticWinBaseName)|$(commonDiagnosticSerilogBaseName)|$(commonDiagnosticLog4netBaseName)|$(commonDiagnosticAppinsightsBaseName)' 
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release' #Debug,
-  publishBaseNames: '$(commonDiagnosticBaseName)|$(commonDiagnosticv2BaseName)|$(commonDiagnosticWinBaseName)|$(commonDiagnosticSerilogBaseName)|$(commonDiagnosticLog4netBaseName)|$(commonDiagnosticAppinsightsBaseName)' 
+  publishBaseNames: '$(commonDiagnosticBaseName)|$(commonDiagnosticWinBaseName)|$(commonDiagnosticSerilogBaseName)|$(commonDiagnosticLog4netBaseName)|$(commonDiagnosticAppinsightsBaseName)' 
   buildProjectFiles: '$(commonDiagnosticBaseName).csproj|$(commonDiagnosticCoreBaseName).csproj|$(commonDiagnosticFullBaseName).csproj|$(commonDiagnosticWinBaseName).csproj|$(commonDiagnosticSerilogBaseName).csproj|$(commonDiagnosticLog4netBaseName).csproj|$(commonDiagnosticAppinsightsBaseName).csproj' 
   publishNupkgFilter: |
     **\bin\$(buildConfiguration)\**\*.$(version).nupkg
     !**\bin\$(buildConfiguration)\**\Common.Diagnostics.Core.$(version).nupkg
     !**\bin\$(buildConfiguration)\**\Common.Diagnostics.Full.$(version).nupkg
 
-  stageVariables: 'version'
+  # stageVariables: 'version'
 
 stages:
 - stage: Build_Assemblies
@@ -163,13 +164,6 @@ stages:
       readonly: true
     
     steps:
-    - task: PowerShell@2
-      inputs:
-        filePath: '.\scripts\v1\00. DumpVariables.ps1'
-      name: psDumpVariables
-      displayName: DumpVariables
-      enabled: true
-
     - powershell: |
         $versionSuffix = "$(buildConfiguration)" 
         $versionSuffix = $versionSuffix -replace "Debug", ".D"  
@@ -177,8 +171,8 @@ stages:
         echo "versionSuffix: '$versionSuffix'"
         echo "##vso[task.setvariable variable=versionSuffix;isOutput=true]$versionSuffix"
         Write-Host "version: '$version', targetVersion: '$(targetVersion)'"
-        echo "##vso[task.setvariable variable=version;isOutput=true]$targetVersion"
-      name: computedValues 
+        echo "##vso[task.setvariable variable=version;isOutput=true]$(targetVersion)"
+      name: computedValues
       displayName: Compute runtime values
 
     - powershell: |
@@ -277,6 +271,10 @@ stages:
   dependsOn: Build_Assemblies
   jobs:
   - job: start
+    variables:
+    - name: targetVersion
+      value: $[dependencies.Increment_Version.outputs['computedValues.version']]
+      readonly: true
     steps:
     - script: echo start job Build_Assemblies
   - deployment: Deploy_2_NugetFeed
@@ -299,25 +297,43 @@ stages:
             name: checkout
             displayName: Checkout Self
 
-          - task: PowerShell@2
-            inputs:
-              filePath: '.\scripts\v1\00. DumpVariables.ps1'
-            name: psDumpVariables1
-            displayName: DumpVariables
-            enabled: true
+          - powershell: |
+              $versionSuffix = "$(buildConfiguration)" 
+              $versionSuffix = $versionSuffix -replace "Debug", ".D"  
+              $versionSuffix = $versionSuffix -replace "Release", ".R"  
+              echo "versionSuffix: '$versionSuffix'"
+              echo "##vso[task.setvariable variable=versionSuffix;isOutput=true]$versionSuffix"
+              Write-Host "version: '$version', targetVersion: '$(targetVersion)'"
+              echo "##vso[task.setvariable variable=version;isOutput=true]$(targetVersion)"
+            name: computedValues 
+            displayName: Compute runtime values
 
           - powershell: |
-              Write-Host "version: '$(version)'"
-              '.\scripts\v1\00. DumpVariables.ps1'
-            name: copyVersionVariable
-            displayName: Copy Output variables (version)
-            continueOnError: true
+              echo "computedValues.version: '$(computedValues.version)'"
+              echo "computedValues.versionSuffix: '$(computedValues.versionSuffix)'"
+              ".\scripts\v1\00. DumpVariables.ps1"
+            name: computedValuesPrint 
+            displayName: Dump computed values
+
+          # - task: PowerShell@2
+          #   inputs:
+          #     filePath: '.\scripts\v1\00. DumpVariables.ps1'
+          #   name: psDumpVariables1
+          #   displayName: DumpVariables
+          #   enabled: true
+
+          # - powershell: |
+          #     Write-Host "version: '$(version)'"
+          #     '.\scripts\v1\00. DumpVariables.ps1'
+          #   name: copyVersionVariable
+          #   displayName: Copy Output variables (version)
+          #   continueOnError: true
 
           - task: NuGetCommand@2
             displayName: Nuget push from 'packages' folder to 'Common.Diagnostics' feed
             inputs:
               command: 'push'
-              packagesToPush: '..\packages\$(buildConfiguration)\*.$(version).nupkg'
+              packagesToPush: '..\packages\$(buildConfiguration)\*.$(computedValues.version).nupkg'
               nuGetFeedType: 'internal'
               publishVstsFeed: $(artifactsFeed)
               allowPackageConflicts: true
@@ -325,7 +341,7 @@ stages:
           - task: NuGetCommand@2
             inputs:
               command: 'push'
-              packagesToPush: '..\packages\$(buildConfiguration)\*.$(version).nupkg'
+              packagesToPush: '..\packages\$(buildConfiguration)\*.$(computedValues.version).nupkg'
               nuGetFeedType: 'external'
               publishFeedCredentials: 'diginsight telemetry'
 
@@ -369,7 +385,7 @@ stages:
             enabled: true
 
           - powershell: |
-              Write-Host "version: '$(version)'"
+              Write-Host "version: '$(computedValues.version)'"
               '.\scripts\v1\00. DumpVariables.ps1'
             name: copyVersionVariable2
             displayName: Copy Output Variables ('version')
@@ -379,7 +395,7 @@ stages:
             inputs:
               ScriptType: 'FilePath'
               ScriptPath: '.\scripts\v1\06. Copy2AzureStorage.ps1'
-              ScriptArguments: '-connectionString ''$(ConnectionStringDevdgwsamplesstorage)'' -sourceFolder $(packagesFolder) -azureShare ''$(azureShare)'' -rootDir ''$(rootDir)'' -version ''$(version)'''
+              ScriptArguments: '-connectionString ''$(ConnectionStringDevdgwsamplesstorage)'' -sourceFolder $(packagesFolder) -azureShare ''$(azureShare)'' -rootDir ''$(rootDir)'' -version ''$(computedValues.version)'''
               azureSubscription: 'Microsoft Azure Internal Consumption(6c310049-95d6-4647-b55a-08f668920781)'
               azurePowerShellVersion: 'LatestVersion'
             name: psCopy2AzureStorageDebug
@@ -391,7 +407,7 @@ stages:
             # - task: PowerShell@2
             #   inputs:
             #     filePath: '.\scripts\v1\06. Copy2AzureStorage.ps1'
-            #     arguments: "-connectionString '$(connectionString)' -sourceFolder $(packagesFolder)\$(buildConfiguration) -azureShare '$(azureShare)' -rootDir '$(rootDir)' -version '$(version)'"
+            #     arguments: "-connectionString '$(connectionString)' -sourceFolder $(packagesFolder)\$(buildConfiguration) -azureShare '$(azureShare)' -rootDir '$(rootDir)' -version '$(computedValues.version)'"
             #   name: psCopy2AzureStorage
             #   env:
             #     connectionString: $(connectionString)
