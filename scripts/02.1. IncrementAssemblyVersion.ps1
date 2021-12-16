@@ -20,7 +20,7 @@ if ([string]::IsNullOrEmpty($buildSourcesDirectory)) { $buildSourcesDirectory = 
 Set-Location "$buildSourcesDirectory"
 
 if ([string]::IsNullOrEmpty($masterProjectBaseName)) { $masterProjectBaseName = "Common.Diagnostics" }
-if ([string]::IsNullOrEmpty($projectBaseNames)) { $projectBaseNames = "Common.Diagnostics|Common.Diagnostics.v2" }
+if ([string]::IsNullOrEmpty($projectBaseNames)) { $projectBaseNames = "Common.Diagnostics" }
 
 $assemblyInfoFile = ".\$masterProjectBaseName\Properties\AssemblyInfo.cs";
 Write-Host "assemblyInfoFile: $assemblyInfoFile"
