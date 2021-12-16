@@ -288,7 +288,7 @@ stages:
   dependsOn: Build_Assemblies
   variables:
   - name: targetVersion
-    value: $[dependencies.Build_Assemblies.Increment_Version.outputs['computedValues.version']]
+    value: $[stageDependencies.Build_Assemblies.Increment_Version.outputs['computedValues.version']]
     readonly: true
   jobs:
   - job: start
