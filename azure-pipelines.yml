@@ -56,10 +56,12 @@ variables:
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release' #Debug,
   publishBaseNames: '$(commonDiagnosticBaseName)|$(commonDiagnosticWinBaseName)|$(commonDiagnosticSerilogBaseName)|$(commonDiagnosticLog4netBaseName)|$(commonDiagnosticAppinsightsBaseName)' 
+  buildProjectFiles: '$(commonDiagnosticBaseName).csproj|$(commonDiagnosticCoreBaseName).csproj|$(commonDiagnosticFullBaseName).csproj|$(commonDiagnosticWinBaseName).csproj|$(commonDiagnosticSerilogBaseName).csproj|$(commonDiagnosticLog4netBaseName).csproj|$(commonDiagnosticAppinsightsBaseName).csproj' 
   publishNupkgFilter: |
-    **\bin\$(buildConfiguration)\**\*.$(version).nupkg
-    !**\bin\$(buildConfiguration)\**\Common.Diagnostics.Core.$(version).nupkg
-    !**\bin\$(buildConfiguration)\**\Common.Diagnostics.Full.$(version).nupkg
+    **\bin\$(buildConfiguration)\**\*.$(computedValues.version).nupkg
+    !**\bin\$(buildConfiguration)\**\Common.Diagnostics.Core.$(computedValues.version).nupkg
+    !**\bin\$(buildConfiguration)\**\Common.Diagnostics.Full.$(computedValues.version).nupkg
+  # $(version)
 
   stageVariables: 'version'
 
@@ -84,29 +86,62 @@ stages:
 
     - task: PowerShell@2
       inputs:
-        filePath: '.\scripts\00. DumpVariables.ps1'
+        filePath: '.\scripts\v1\00. DumpVariables.ps1'
       name: psDumpVariables
       displayName: DumpVariables
       enabled: true
 
     - task: PowerShell@2
       inputs:
-        filePath: '.\scripts\02. IncrementAssemblyVersion.ps1'
-        arguments: '-masterProjectBaseName ''$(commonDiagnosticBaseName)'' -projectBaseNames ''$(buildBaseNames)'' ' 
-      name: psIncrementAssemblyVersion
-      displayName: IncrementAssemblyVersion
+        filePath: '.\scripts\v1\01. GetAssemblyVersion.ps1'
+        arguments: '-projectFile ''$(commonDiagnosticProj)'' ' 
+      name: psGetAssemblyVersion
+      displayName: GetAssemblyVersion
       enabled: true
       continueOnError: true
 
     - powershell: |
-        Write-Host "version: '$(version)'"
-        Write-Host "psIncrementAssemblyVersion.version '$(psIncrementAssemblyVersion.version)'"
-        $version = $(psIncrementAssemblyVersion.version)
-        Write-Host "version: '$(version)'"
-        ".\scripts\00. DumpVariables.ps1"
-      name: readVersion
+        $versionSuffix = "$(buildConfiguration)" 
+        $versionSuffix = $versionSuffix -replace "Debug", ".D"  
+        $versionSuffix = $versionSuffix -replace "Release", ".R"  
+        echo "versionSuffix: '$versionSuffix'"
+        echo "##vso[task.setvariable variable=versionSuffix;isOutput=true]$versionSuffix"
+
+        $version = [version]"$(psGetAssemblyVersion.version)"
+        $newVersion = "{0}.{1}.{2}.{3}" -f $version.Major, $version.Minor, $version.Build, ($version.Revision + 1)
+        Write-Host "version: '$version', newVersion: '$newVersion'"
+        echo "##vso[task.setvariable variable=version;isOutput=true]$newVersion"
+      name: computedValues 
+      displayName: Compute runtime values
+
+    - powershell: |
+        echo "computedValues.versionSuffix: '$(computedValues.versionSuffix)'"
+        echo "computedValues.version: '$(computedValues.version)'"
+        ".\scripts\v1\00. DumpVariables.ps1"
+      name: computedValuesPrint 
+      displayName: Dump computed values
+
+    - task: PowerShell@2
+      inputs:
+        filePath: '.\scripts\v1\01.1 SetAssemblyVersion.ps1'
+        arguments: '-projectsFiles ''$(buildProjectFiles)'' -filterPattern '''' -version ''$(computedValues.version)'' ' 
+      name: psSetAssemblyVersion
+      displayName: SetAssemblyVersion
+      enabled: true
+      continueOnError: true
+
+    - powershell: |
+        echo "version: '$(version)'"
+        echo "computedValues.version '$(computedValues.version)'"
+      name: readVersion1
       displayName: Read Versions
       continueOnError: true
+    - task: PowerShell@2
+      inputs:
+        filePath: '.\scripts\v1\01.9 CommitChanges.ps1'
+      name: psCommitChanges
+      displayName: CommitChanges
+      enabled: true
 
     - bash: |
         curl -fL -XPUT -H "Authorization:Bearer $(System.AccessToken)" -H "Content-Type:application/json" \
@@ -121,21 +156,12 @@ stages:
             },
             "version": {
               "isSecret": false,
-              "value": "$(psIncrementAssemblyVersion.version)"
+              "value": "$(computedValues.version)"
             }
           }
         }' \
         $(System.TeamFoundationCollectionUri)/$(System.TeamProject)/_apis/distributedtask/variablegroups/$(versionGroupId)?api-version=5.0-preview.1
-      displayName: 'Set variable in variable group to current $(psIncrementAssemblyVersion.version)'
-
-    - powershell: |
-        Write-Host "version: '$(version)'"
-        Write-Host "psIncrementAssemblyVersion.version '$(psIncrementAssemblyVersion.version)'"
-        $version = $(psIncrementAssemblyVersion.version)
-        Write-Host "version: '$(version)'"
-      name: readVersion1
-      displayName: Read Versions
-      continueOnError: true
+      displayName: 'Set variable in variable group to current $(computedValues.version)'
 
   - job: Build_Assemblies
     dependsOn: Increment_Version
@@ -150,27 +176,45 @@ stages:
           buildConfiguration: 'Release'
     workspace: 
       clean: outputs
+    variables:
+    - name: targetVersion
+      value: $[dependencies.Increment_Version.outputs['computedValues.version']]
+      readonly: true
+
     steps:
     - powershell: |
-        Write-Host "version: '$(version)'"
-      name: readVersion2
-      displayName: Read Versions
+        $versionSuffix = "$(buildConfiguration)" 
+        $versionSuffix = $versionSuffix -replace "Debug", ".D"  
+        $versionSuffix = $versionSuffix -replace "Release", ".R"  
+        echo "versionSuffix: '$versionSuffix'"
+        echo "##vso[task.setvariable variable=versionSuffix;isOutput=true]$versionSuffix"
+        Write-Host "version: '$version', targetVersion: '$(targetVersion)'"
+        echo "##vso[task.setvariable variable=version;isOutput=true]$(targetVersion)"
+      name: computedValues
+      displayName: Compute runtime values
+
+    - powershell: |
+        echo "computedValues.version: '$(computedValues.version)'"
+        echo "computedValues.versionSuffix: '$(computedValues.versionSuffix)'"
+        ".\scripts\v1\00. DumpVariables.ps1"
+      name: computedValuesPrint 
+      displayName: Dump computed values
+
+    - task: PowerShell@2
+      inputs:
+        filePath: '.\scripts\v1\01.1 SetAssemblyVersion.ps1'
+        arguments: '-projectsFiles ''$(buildProjectFiles)'' -filterPattern '''' -version ''$(computedValues.version)'' ' 
+      name: psSetAssemblyVersion
+      displayName: SetAssemblyVersion
+      enabled: true
       continueOnError: true
 
     - task: PowerShell@2
       inputs:
-        filePath: '.\scripts\00. DumpVariables.ps1'
+        filePath: '.\scripts\v1\00. DumpVariables.ps1'
       name: psDumpVariables0
       displayName: DumpVariables
       enabled: true
-
-    - task: PowerShell@2
-      inputs:
-        filePath: '.\scripts\02.1. IncrementAssemblyVersion.ps1'
-      name: psIncrementAssemblyVersion
-      displayName: IncrementAssemblyVersion
-      enabled: true
-      continueOnError: true
 
     - task: NuGetToolInstaller@1
       displayName: Install NuGet tool
@@ -243,10 +287,15 @@ stages:
 
 - stage: Deploy_Assemblies
   dependsOn: Build_Assemblies
+  variables:
+  - name: targetVersion
+    value: $[stageDependencies.Build_Assemblies.Increment_Version.outputs['computedValues.version']]
+    readonly: true
   jobs:
   - job: start
     steps:
     - script: echo start job Build_Assemblies
+
   - deployment: Deploy_2_NugetFeed
     displayName: Deploy 2 nuget feed 
     dependsOn: start
@@ -267,25 +316,36 @@ stages:
             name: checkout
             displayName: Checkout Self
 
-          - task: PowerShell@2
-            inputs:
-              filePath: '.\scripts\00. DumpVariables.ps1'
-            name: psDumpVariables1
-            displayName: DumpVariables
-            enabled: true
+          - powershell: |
+              $versionSuffix = "$(buildConfiguration)" 
+              $versionSuffix = $versionSuffix -replace "Debug", ".D"  
+              $versionSuffix = $versionSuffix -replace "Release", ".R"  
+              echo "versionSuffix: '$versionSuffix'"
+              echo "##vso[task.setvariable variable=versionSuffix;isOutput=true]$versionSuffix"
+              Write-Host "version: '$version', targetVersion: '$(targetVersion)'"
+              echo "##vso[task.setvariable variable=version;isOutput=true]$(targetVersion)"
+            name: computedValues
+            displayName: Compute runtime values
 
           - powershell: |
-              Write-Host "version: '$(version)'"
-              '.\scripts\00. DumpVariables.ps1'
-            name: copyVersionVariable
-            displayName: Copy Output variables (version)
-            continueOnError: true
+              echo "computedValues.version: '$(computedValues.version)'"
+              echo "computedValues.versionSuffix: '$(computedValues.versionSuffix)'"
+              ".\scripts\v1\00. DumpVariables.ps1"
+            name: computedValuesPrint 
+            displayName: Dump computed values
+
+          # - powershell: |
+          #     Write-Host "version: '$(version)'"
+          #     '.\scripts\v1\00. DumpVariables.ps1'
+          #   name: copyVersionVariable
+          #   displayName: Copy Output variables (version)
+          #   continueOnError: true
 
           - task: NuGetCommand@2
             displayName: Nuget push from 'packages' folder to 'Common.Diagnostics' feed
             inputs:
               command: 'push'
-              packagesToPush: '..\packages\$(buildConfiguration)\*.$(version).nupkg'
+              packagesToPush: '..\packages\$(buildConfiguration)\*.$(computedValues.version).nupkg'
               nuGetFeedType: 'internal'
               publishVstsFeed: $(artifactsFeed)
               allowPackageConflicts: true
@@ -293,7 +353,7 @@ stages:
           - task: NuGetCommand@2
             inputs:
               command: 'push'
-              packagesToPush: '..\packages\$(buildConfiguration)\*.$(version).nupkg'
+              packagesToPush: '..\packages\$(buildConfiguration)\*.$(computedValues.version).nupkg'
               nuGetFeedType: 'external'
               publishFeedCredentials: 'diginsight telemetry'
 
@@ -321,6 +381,24 @@ stages:
             name: checkout
             displayName: Checkout Self
 
+          - powershell: |
+              $versionSuffix = "$(buildConfiguration)" 
+              $versionSuffix = $versionSuffix -replace "Debug", ".D"  
+              $versionSuffix = $versionSuffix -replace "Release", ".R"  
+              echo "versionSuffix: '$versionSuffix'"
+              echo "##vso[task.setvariable variable=versionSuffix;isOutput=true]$versionSuffix"
+              Write-Host "version: '$version', targetVersion: '$(targetVersion)'"
+              echo "##vso[task.setvariable variable=version;isOutput=true]$(targetVersion)"
+            name: computedValues
+            displayName: Compute runtime values
+
+          - powershell: |
+              echo "computedValues.version: '$(computedValues.version)'"
+              echo "computedValues.versionSuffix: '$(computedValues.versionSuffix)'"
+              ".\scripts\v1\00. DumpVariables.ps1"
+            name: computedValuesPrint 
+            displayName: Dump computed values
+
           - task: AzureKeyVault@1
             inputs:
               azureSubscription: 'Microsoft Azure Internal Consumption(6c310049-95d6-4647-b55a-08f668920781)'
@@ -331,23 +409,23 @@ stages:
 
           - task: PowerShell@2
             inputs:
-              filePath: '.\scripts\00. DumpVariables.ps1'
+              filePath: '.\scripts\v1\00. DumpVariables.ps1'
             name: psDumpVariables2
             displayName: DumpVariables
             enabled: true
 
-          - powershell: |
-              Write-Host "version: '$(version)'"
-              '.\scripts\00. DumpVariables.ps1'
-            name: copyVersionVariable2
-            displayName: Copy Output Variables ('version')
-            continueOnError: true
+          # - powershell: |
+          #     Write-Host "version: '$(version)'"
+          #     '.\scripts\v1\00. DumpVariables.ps1'
+          #   name: copyVersionVariable2
+          #   displayName: Copy Output Variables ('version')
+          #   continueOnError: true
 
           - task: AzurePowerShell@5
             inputs:
               ScriptType: 'FilePath'
-              ScriptPath: '.\scripts\06. Copy2AzureStorage.ps1'
-              ScriptArguments: '-connectionString ''$(ConnectionStringDevdgwsamplesstorage)'' -sourceFolder $(packagesFolder) -azureShare ''$(azureShare)'' -rootDir ''$(rootDir)'' -version ''$(version)'''
+              ScriptPath: '.\scripts\v1\06. Copy2AzureStorage.ps1'
+              ScriptArguments: '-connectionString ''$(ConnectionStringDevdgwsamplesstorage)'' -sourceFolder $(packagesFolder) -azureShare ''$(azureShare)'' -rootDir ''$(rootDir)'' -version ''$(computedValues.version)'''
               azureSubscription: 'Microsoft Azure Internal Consumption(6c310049-95d6-4647-b55a-08f668920781)'
               azurePowerShellVersion: 'LatestVersion'
             name: psCopy2AzureStorageDebug
@@ -359,7 +437,7 @@ stages:
             # - task: PowerShell@2
             #   inputs:
             #     filePath: '.\scripts\06. Copy2AzureStorage.ps1'
-            #     arguments: "-connectionString '$(connectionString)' -sourceFolder $(packagesFolder)\$(buildConfiguration) -azureShare '$(azureShare)' -rootDir '$(rootDir)' -version '$(version)'"
+            #     arguments: "-connectionString '$(connectionString)' -sourceFolder $(packagesFolder)\$(buildConfiguration) -azureShare '$(azureShare)' -rootDir '$(rootDir)' -version '$(computedValues.version)'"
             #   name: psCopy2AzureStorage
             #   env:
             #     connectionString: $(connectionString)
