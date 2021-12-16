@@ -61,7 +61,6 @@ variables:
     **\bin\$(buildConfiguration)\**\*.$(computedValues.version).nupkg
     !**\bin\$(buildConfiguration)\**\Common.Diagnostics.Core.$(computedValues.version).nupkg
     !**\bin\$(buildConfiguration)\**\Common.Diagnostics.Full.$(computedValues.version).nupkg
-  # $(version)
 
   stageVariables: 'version'
 
@@ -333,13 +332,6 @@ stages:
             name: computedValuesPrint 
             displayName: Dump computed values
 
-          # - powershell: |
-          #     Write-Host "version: '$(version)'"
-          #     '.\scripts\v1\00. DumpVariables.ps1'
-          #   name: copyVersionVariable
-          #   displayName: Copy Output variables (version)
-          #   continueOnError: true
-
           - task: NuGetCommand@2
             displayName: Nuget push from 'packages' folder to 'Common.Diagnostics' feed
             inputs:
@@ -412,13 +404,6 @@ stages:
             name: psDumpVariables2
             displayName: DumpVariables
             enabled: true
-
-          # - powershell: |
-          #     Write-Host "version: '$(version)'"
-          #     '.\scripts\v1\00. DumpVariables.ps1'
-          #   name: copyVersionVariable2
-          #   displayName: Copy Output Variables ('version')
-          #   continueOnError: true
 
           - task: AzurePowerShell@5
             inputs:
