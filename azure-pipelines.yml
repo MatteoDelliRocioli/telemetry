@@ -61,9 +61,9 @@ variables:
   publishBaseNames: '$(commonDiagnosticBaseName)|$(commonDiagnosticWinBaseName)|$(commonDiagnosticSerilogBaseName)|$(commonDiagnosticLog4netBaseName)|$(commonDiagnosticAppinsightsBaseName)' 
   buildProjectFiles: '$(commonDiagnosticBaseName).csproj|$(commonDiagnosticCoreBaseName).csproj|$(commonDiagnosticFullBaseName).csproj|$(commonDiagnosticWinBaseName).csproj|$(commonDiagnosticSerilogBaseName).csproj|$(commonDiagnosticLog4netBaseName).csproj|$(commonDiagnosticAppinsightsBaseName).csproj' 
   publishNupkgFilter: |
-    **\bin\$(buildConfiguration)\**\*.$(version).nupkg
-    !**\bin\$(buildConfiguration)\**\Common.Diagnostics.Core.$(version).nupkg
-    !**\bin\$(buildConfiguration)\**\Common.Diagnostics.Full.$(version).nupkg
+    **\bin\$(buildConfiguration)\**\Common.Diagnostics.*.nupkg
+    !**\bin\$(buildConfiguration)\**\Common.Diagnostics.Core.*.nupkg
+    !**\bin\$(buildConfiguration)\**\Common.Diagnostics.Full.*.nupkg
 
   # stageVariables: 'version'
 
