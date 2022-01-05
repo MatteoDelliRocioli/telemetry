@@ -75,6 +75,10 @@ namespace EasySample
                 scope.LogError(() => "this is a error trace", "Resource");
 
                 scope.LogError(() => "this is a error trace", "Resource");
+
+                var guid = Guid.NewGuid();
+                var uri = new Uri("http://localhost:80");
+                scope.LogDebug(new { guid, uri });
             }
         }
         void sampleMethod()

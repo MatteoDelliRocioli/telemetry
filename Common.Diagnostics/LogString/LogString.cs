@@ -61,6 +61,8 @@ namespace Common
                     case int[] o: return o.ToLogStringInternal();
                     case IDictionary o: return o.ToLogStringInternal();
                     case ICollection o: return o.ToLogStringInternal();
+                    case Guid o: return o.ToLogStringInternal();
+                    case Uri o: return o.ToLogStringInternal();
                     default: break;
                 }
 
@@ -96,6 +98,18 @@ namespace Common
             }
             catch (Exception /*ex*/) { }
             return null;
+        }
+        public static string ToLogStringInternal(this Uri pthis)
+        {
+            if (pthis.Equals(default(KeyValuePair<string, string>))) { return "null"; }
+            string logString = $"{{{nameof(Uri)}:{{AbsoluteUri:{pthis.AbsoluteUri},OriginalString:{pthis.OriginalString},LocalPath:{pthis.LocalPath},AbsolutePath:{pthis.AbsolutePath},IsAbsoluteUri:{pthis.IsAbsoluteUri},UserEscaped:{pthis.UserEscaped},Scheme:{pthis.Scheme},Host:{pthis.Host},Authority:{pthis.Authority},Port:{pthis.Port},UserEscaped:{pthis.UserEscaped},DnsSafeHost:{pthis.DnsSafeHost},Fragment:{pthis.Fragment},HostNameType:{pthis.HostNameType},IdnHost:{pthis.IdnHost},IsDefaultPort:{pthis.IsDefaultPort},IsFile:{pthis.IsFile},IsLoopback:{pthis.IsLoopback},IsUnc:{pthis.IsUnc},PathAndQuery:{pthis.PathAndQuery}}}}}";
+            return logString;
+        }
+        public static string ToLogStringInternal(this Guid pthis)
+        {
+            if (pthis.Equals(default(KeyValuePair<string, string>))) { return "null"; }
+            var logString = pthis.ToString();
+            return logString;
         }
         public static string ToLogStringInternal(this KeyValuePair<string, string> pthis)
         {
