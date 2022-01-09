@@ -284,7 +284,7 @@ other strategies can be implemented in the future to further control perfomrance
 Current version of Diginsight telemetry provide support for Both __.Net Log providers__ and DotNet __Systen Diagnostics listeners__.<br>
 The current document focused on using telemetry with __.Net Log providers__.<br><br>
 
-[/README.v1.md](Readme.v1.md) describes how to use Diginsight telemetry with standard DotNet __Systen Diagnostics listeners__.
+[README.v1.md](README.v1.md) describes how to use Diginsight telemetry with standard DotNet __Systen Diagnostics listeners__.
 <br><br>
 
 # Build and Test 
