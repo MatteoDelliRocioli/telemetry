@@ -45,7 +45,7 @@ in the previous section __standard log4net provider__ and __standard Application
 3.	Add telemetry to your code with __BeginMethodScope(), BeginNamedScope()__ and __ILogger Statements__:
 ```c#
 	- using var scope = _logger.BeginMethodScope(); // defines a method scope by means of an ILogger instance (class type is taken by the ILogger instance)
-	- using var scope = _logger.BeginNamedScope(); // defines a named scope within a method scope (eg. to describe loop code sections or async method callbacks).
+	- using var scope = _logger.BeginNamedScope("scopeName"); // defines a named scope within a method scope (eg. to describe loop code sections or async method callbacks).
 
 	- using var innerScope = _logger.BeginMethodScope(new { configuration = configuration .GetLogString()}); // defines a method scope where method parameters are specified 
 ```
