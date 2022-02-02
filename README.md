@@ -81,8 +81,30 @@ use __standard ILogger statements__ or __TraceLogger static methods__ to add tra
 	- TraceLogger.LogCritical("this is a critical trace");
 	- TraceLogger.LogException(ex);
 ```
-
 in this case log traces are added to the most inner scope, for the current thread.
+
+for performance optimization reasons, instead of using the Log* overrides that work with strings you may want to use the Log* overrides that work with delegates
+
+```c#
+	// standard Ilogger statements:
+	- _logger.LogTrace(() => "this is a Trace trace");
+	- _logger.LogDebug(() => "this is a Debug trace");
+	- _logger.LogInformation(() => "this is a Information trace");
+	- _logger.LogWarning(() => "this is a Warning trace");
+	- _logger.LogError(() => "this is a error trace");
+	- _logger.LogCritical(() => "this is a critical trace");
+	- _logger.LogException(() => ex);
+
+	// log statements with TraceLogger static methods:
+	- TraceLogger.LogTrace(() => "this is a Trace trace");
+	- TraceLogger.LogDebug(() => "this is a Debug trace");
+	- TraceLogger.LogInformation(() => "this is a Information trace");
+	- TraceLogger.LogWarning(() => "this is a Warning trace");
+	- TraceLogger.LogError(() => "this is a error trace");
+	- TraceLogger.LogCritical(() => "this is a critical trace");
+	- TraceLogger.LogException(() => ex);
+```
+
 <br>
 <br>
 # TELEMETRY PROVIDERS
