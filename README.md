@@ -83,7 +83,7 @@ use __standard ILogger statements__ or __TraceLogger static methods__ to add tra
 ```
 in this case log traces are added to the most inner scope, for the current thread.
 
-for performance optimization reasons, instead of using the Log* overrides that work with strings you may want to use the Log* overrides that work with delegates
+For performance optimization reasons, you may want to use the Log* overrides that work with delegates instead of using the Log* overrides that work with strings
 
 ```c#
 	// standard Ilogger statements:
