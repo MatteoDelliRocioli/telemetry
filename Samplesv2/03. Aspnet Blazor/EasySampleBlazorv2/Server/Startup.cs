@@ -42,8 +42,9 @@ namespace EasySampleBlazorv2.Server
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            using var scope = _logger.BeginMethodScope();
+            using var scope = _logger.BeginMethodScope(new { app, env = env.GetLogString() });
 
+            scope.LogDebug(new { env.EnvironmentName });
             var isDevelopment = env.IsDevelopment(); scope.LogDebug($"env.IsDevelopment(); returned {isDevelopment}");
             if (env.IsDevelopment())
             {

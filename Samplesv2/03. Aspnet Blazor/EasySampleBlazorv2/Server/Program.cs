@@ -37,7 +37,6 @@ namespace EasySampleBlazorv2.Server
                               var log4NetProvider = new Log4NetProvider(options);
                               loggingBuilder.AddDiginsightFormatted(log4NetProvider, context.Configuration); scopeInner.LogDebug($"loggingBuilder.AddDiginsightFormatted(log4NetProvider, context.Configuration);");
 
-                              // AppInsightsKey
                               var appInsightsKey = context.Configuration["AppSettings:AppInsightsKey"]; scopeInner.LogDebug(new { appInsightsKey });
                               if (!string.IsNullOrEmpty(appInsightsKey))
                               {
@@ -50,10 +49,10 @@ namespace EasySampleBlazorv2.Server
                                   // loggingBuilder.AddFilter<ApplicationInsightsLoggerProvider>("", LogLevel.Debug);
                               }
 
-                              var debugProvider = new TraceLoggerDebugProvider();
-                              var traceLoggerProvider = new TraceLoggerFormatProvider(context.Configuration) { ConfigurationSuffix = "Debug" };
-                              traceLoggerProvider.AddProvider(debugProvider);
-                              loggingBuilder.AddProvider(traceLoggerProvider); scopeInner.LogDebug($"loggingBuilder.AddProvider(traceLoggerProvider);");
+                              //var debugProvider = new TraceLoggerDebugProvider();
+                              //var traceLoggerProvider = new TraceLoggerFormatProvider(context.Configuration) { ConfigurationSuffix = "Debug" };
+                              //traceLoggerProvider.AddProvider(debugProvider);
+                              //loggingBuilder.AddProvider(traceLoggerProvider); scopeInner.LogDebug($"loggingBuilder.AddProvider(traceLoggerProvider);");
 
                               // loggingBuilder.AddAzureWebAppDiagnostics(); // STREAMING LOG not working ?
 
