@@ -30,6 +30,8 @@ namespace EasySampleBlazorv2.Server
                           {
                               using var scopeInner = TraceLogger.BeginNamedScope(T, "ConfigureLogging.Callback");
 
+                              loggingBuilder.AddConfiguration(context.Configuration.GetSection("Logging"));
+
                               loggingBuilder.ClearProviders(); scopeInner.LogDebug($"loggingBuilder.ClearProviders();");
 
                               var options = new Log4NetProviderOptions();

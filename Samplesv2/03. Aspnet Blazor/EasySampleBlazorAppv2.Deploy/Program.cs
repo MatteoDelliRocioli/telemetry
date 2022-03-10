@@ -20,6 +20,8 @@ namespace EasySampleBlazorAppv2.Deploy
             var builder = CreateHostBuilder(args)
                           .ConfigureLogging((context, loggingBuilder) =>
                           {
+                              loggingBuilder.AddConfiguration(context.Configuration.GetSection("Logging"));
+
                               loggingBuilder.ClearProviders();
 
                               var options = new Log4NetProviderOptions();
@@ -33,7 +35,7 @@ namespace EasySampleBlazorAppv2.Deploy
                               var aio = Options.Create<ApplicationInsightsLoggerOptions>(appinsightOptions);
                               loggingBuilder.AddDiginsightJson(new ApplicationInsightsLoggerProvider(tco, aio), context.Configuration);
 
-                              loggingBuilder.AddFilter<ApplicationInsightsLoggerProvider>("", LogLevel.Debug);
+                              //loggingBuilder.AddFilter<ApplicationInsightsLoggerProvider>("", LogLevel.Debug);
                           });
 
             var host = builder.Build();

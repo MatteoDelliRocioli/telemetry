@@ -76,8 +76,9 @@ namespace EasySample
                         })
                         .ConfigureLogging((context, loggingBuilder) =>
                         {
+                            loggingBuilder.AddConfiguration(context.Configuration.GetSection("Logging"));
+
                             loggingBuilder.ClearProviders();
-                            //loggingBuilder.SetMinimumLevel(LogLevel.Trace);
 
                             //var consoleProvider = new TraceLoggerConsoleProvider();
                             //loggingBuilder.AddDiginsightFormatted(consoleProvider, configuration);
@@ -94,7 +95,7 @@ namespace EasySample
                             //loggingBuilder.AddDiginsightJson(new ApplicationInsightsLoggerProvider(tco, aio), configuration);
                             loggingBuilder.AddDiginsightFormatted(new ApplicationInsightsLoggerProvider(tco, aio), configuration);
 
-                            loggingBuilder.AddFilter<ApplicationInsightsLoggerProvider>("", LogLevel.Debug);
+                            //loggingBuilder.AddFilter<ApplicationInsightsLoggerProvider>("", LogLevel.Debug);
                         }).Build();
 
                 Host.InitTraceLogger();
