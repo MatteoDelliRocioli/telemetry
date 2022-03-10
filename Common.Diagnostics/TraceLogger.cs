@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
+using Microsoft.Win32.SafeHandles;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -41,6 +42,7 @@ namespace Common
         public static Stopwatch Stopwatch = TraceManager.Stopwatch;
         public static IHost Host { get; set; }
         internal static Process CurrentProcess { get; set; }
+        internal static SafeProcessHandle CurrentProcessSafeProcessHandle { get; set; }
         internal static Assembly EntryAssembly { get; set; }
         public static SystemDiagnosticsConfig Config { get; set; }
         public static string ProcessName = null;
@@ -66,6 +68,7 @@ namespace Common
                 CurrentProcess = Process.GetCurrentProcess();
                 ProcessName = CurrentProcess.ProcessName;
                 ProcessId = CurrentProcess.Id;
+                CurrentProcessSafeProcessHandle = CurrentProcess.SafeHandle;
             }
             catch (PlatformNotSupportedException)
             {
