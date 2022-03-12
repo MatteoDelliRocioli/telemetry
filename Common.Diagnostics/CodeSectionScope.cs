@@ -624,8 +624,12 @@ namespace Common
             var t = entry.CodeSectionBase?.T;
             Type loggerType = typeof(ILogger<>);
             loggerType = loggerType.MakeGenericType(new[] { t });
-            var host = TraceLogger.Host;
-            var loggerTemp = host.Services.GetRequiredService(loggerType) as ILogger;
+            
+            //var host = TraceLogger.Host;
+            //var loggerTemp = host.Services.GetRequiredService(loggerType) as ILogger;
+            var loggerFactory = TraceLogger.LoggerFactory;
+            var loggerTemp = loggerFactory.CreateLogger(loggerType);
+
             return loggerTemp;
         } 
         #endregion

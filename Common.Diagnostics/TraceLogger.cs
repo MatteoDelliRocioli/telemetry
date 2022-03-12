@@ -40,7 +40,7 @@ namespace Common
         public string Name { get; set; }
         public static TraceSource TraceSource { get; set; }
         public static Stopwatch Stopwatch = TraceManager.Stopwatch;
-        public static IHost Host { get; set; }
+        //public static IHost Host { get; set; }
         public static ILoggerFactory LoggerFactory { get; set; }
         internal static Process CurrentProcess { get; set; }
         internal static SafeProcessHandle CurrentProcessSafeProcessHandle { get; set; }
@@ -128,7 +128,7 @@ namespace Common
                 {
                     Type loggerType = typeof(ILogger<>);
                     loggerType = loggerType.MakeGenericType(new[] { t });
-                    
+
                     //var host = TraceLogger.Host;
                     //logger = host.Services.GetRequiredService(loggerType) as ILogger;
                     var loggerFactory = TraceLogger.LoggerFactory;
@@ -235,8 +235,12 @@ namespace Common
             var t = entry.CodeSectionBase?.T;
             Type loggerType = typeof(ILogger<>);
             loggerType = loggerType.MakeGenericType(new[] { t });
-            var host = TraceLogger.Host;
-            var loggerTemp = host.Services.GetRequiredService(loggerType) as ILogger;
+
+            //var host = TraceLogger.Host;
+            //var loggerTemp = host.Services.GetRequiredService(loggerType) as ILogger;
+            var loggerFactory = TraceLogger.LoggerFactory;
+            var loggerTemp = loggerFactory.CreateLogger(loggerType);
+
             return loggerTemp;
         }
         #endregion
@@ -725,11 +729,12 @@ namespace Common
             var startTicks = TraceLogger.Stopwatch.ElapsedTicks;
 
             ILogger<T> logger = null;
-            if (host == null) { host = TraceLogger.Host; }
-            if (host != null)
-            {
-                logger = host.Services.GetRequiredService<ILogger<T>>();
-            }
+            //if (host == null) { host = TraceLogger.Host; }
+            //if (host != null) { logger = host.Services.GetRequiredService<ILogger<T>>(); }
+
+            var loggerFactory = host.Services.GetRequiredService<ILoggerFactory>();
+            if (loggerFactory == null) { loggerFactory = TraceLogger.LoggerFactory; }
+            logger = loggerFactory.CreateLogger<T>();
 
             var sec = new CodeSectionScope(logger, typeof(T), null, payload, TraceLogger.TraceSource, sourceLevel, logLevel, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber);
             var stopTicks = TraceLogger.Stopwatch.ElapsedTicks;
@@ -741,12 +746,17 @@ namespace Common
             var startTicks = TraceLogger.Stopwatch.ElapsedTicks;
 
             ILogger logger = null;
-            if (host == null) { host = TraceLogger.Host; }
-            if (host != null)
+            //if (host == null) { host = TraceLogger.Host; }
+
+            var loggerFactory = host?.Services?.GetRequiredService<ILoggerFactory>();
+            if (loggerFactory == null) { loggerFactory = TraceLogger.LoggerFactory; }
+
+            if (loggerFactory != null)
             {
                 Type loggerType = typeof(ILogger<>);
                 loggerType = loggerType.MakeGenericType(new[] { t });
-                logger = host.Services.GetRequiredService(loggerType) as ILogger;
+                //logger = host.Services.GetRequiredService(loggerType) as ILogger;
+                logger = loggerFactory.CreateLogger(loggerType);
             }
 
             var sec = new CodeSectionScope(logger, t, null, payload, TraceLogger.TraceSource, sourceLevel, logLevel, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber);
@@ -759,20 +769,21 @@ namespace Common
         {
             if (host == null) return null;
 
-            TraceLogger.Host = host;
-            TraceLogger.LoggerFactory = host.Services.GetRequiredService<ILoggerFactory>();
+            //TraceLogger.Host = host;
             //var logger = host.Services.GetRequiredService<ILogger<T>>();
-            var logger = TraceLogger.LoggerFactory.CreateLogger<T>();
+            
+            TraceLogger.LoggerFactory = host?.Services?.GetRequiredService<ILoggerFactory>();
+            var logger = TraceLogger.LoggerFactory?.CreateLogger<T>();
             return logger;
         }
-        public static void InitTraceLogger(this IHost Host)
+        public static void InitTraceLogger(this IHost host)
         {
             using (new SwitchOnDispose(TraceLogger._lockListenersNotifications, true))
             using (new SwitchOnDispose(TraceLogger._isInitializing, true))
             using (new SwitchOnDispose(TraceLogger._isInitializeComplete, false))
             {
-                TraceLogger.Host = Host;
-                TraceLogger.LoggerFactory = Host.Services.GetRequiredService<ILoggerFactory>();
+                //TraceLogger.Host = host;
+                TraceLogger.LoggerFactory = host.Services.GetRequiredService<ILoggerFactory>();
             }
             return;
         }
@@ -961,7 +972,7 @@ namespace Common
         //    builder.AddProvider(traceLoggerProvider);
         //    return builder;
         //}
-    
+
     }
     public static class TraceLoggerFactoryExtensions
     {
