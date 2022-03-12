@@ -41,6 +41,7 @@ namespace Common
         public static TraceSource TraceSource { get; set; }
         public static Stopwatch Stopwatch = TraceManager.Stopwatch;
         public static IHost Host { get; set; }
+        public static ILoggerFactory LoggerFactory { get; set; }
         internal static Process CurrentProcess { get; set; }
         internal static SafeProcessHandle CurrentProcessSafeProcessHandle { get; set; }
         internal static Assembly EntryAssembly { get; set; }
@@ -123,12 +124,15 @@ namespace Common
                 ILogger logger = null;
                 if (t == null) { return; }
 
-                if (TraceLogger.Host != null)
+                if (TraceLogger.LoggerFactory != null)
                 {
                     Type loggerType = typeof(ILogger<>);
                     loggerType = loggerType.MakeGenericType(new[] { t });
-                    var host = TraceLogger.Host;
-                    logger = host.Services.GetRequiredService(loggerType) as ILogger;
+                    
+                    //var host = TraceLogger.Host;
+                    //logger = host.Services.GetRequiredService(loggerType) as ILogger;
+                    var loggerFactory = TraceLogger.LoggerFactory;
+                    logger = loggerFactory.CreateLogger(loggerType);
 
                     logger.Log<TraceEntry>(entry.LogLevel, new EventId(0, entry.RequestContext?.RequestId), entry, entry.Exception, DefaultFormatTraceEntry.FormatTraceEntry); // formatTraceEntry
                 }
@@ -242,10 +246,12 @@ namespace Common
             var startTicks = TraceLogger.Stopwatch.ElapsedTicks;
 
             ILogger<T> logger = null;
-            if (logger == null && TraceLogger.Host != null)
+            if (logger == null && TraceLogger.LoggerFactory != null)
             {
-                var host = TraceLogger.Host;
-                logger = host.Services.GetRequiredService<ILogger<T>>();
+                var loggerFactory = TraceLogger.LoggerFactory;
+                logger = loggerFactory.CreateLogger<T>();
+                //    var host = TraceLogger.Host;
+                //    logger = host.Services.GetRequiredService<ILogger<T>>();
             }
 
             var sec = new CodeSectionScope(logger, typeof(T), null, payload, TraceLogger.TraceSource, sourceLevel, logLevel, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber);
@@ -258,12 +264,14 @@ namespace Common
             var startTicks = TraceLogger.Stopwatch.ElapsedTicks;
 
             ILogger logger = null;
-            if (TraceLogger.Host != null)
+            if (TraceLogger.LoggerFactory != null)
             {
                 Type loggerType = typeof(ILogger<>);
                 loggerType = loggerType.MakeGenericType(new[] { t });
-                var host = TraceLogger.Host;
-                logger = host.Services.GetRequiredService(loggerType) as ILogger;
+                //var host = TraceLogger.Host;
+                //logger = host.Services.GetRequiredService(loggerType) as ILogger;
+                var loggerFactory = TraceLogger.LoggerFactory;
+                logger = loggerFactory.CreateLogger(loggerType);
             }
 
             var sec = new CodeSectionScope(logger, t, null, payload, TraceLogger.TraceSource, sourceLevel, logLevel, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber);
@@ -276,10 +284,12 @@ namespace Common
             var startTicks = TraceLogger.Stopwatch.ElapsedTicks;
 
             ILogger<T> logger = null;
-            if (logger == null && TraceLogger.Host != null)
+            if (logger == null && TraceLogger.LoggerFactory != null)
             {
-                var host = TraceLogger.Host;
-                logger = host.Services.GetRequiredService<ILogger<T>>();
+                //var host = TraceLogger.Host;
+                //logger = host.Services.GetRequiredService<ILogger<T>>();
+                var loggerFactory = TraceLogger.LoggerFactory;
+                logger = loggerFactory.CreateLogger<T>();
             }
 
             var sec = new CodeSectionScope(logger, typeof(T), name, payload, TraceLogger.TraceSource, sourceLevel, logLevel, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber);
@@ -292,12 +302,14 @@ namespace Common
             var startTicks = TraceLogger.Stopwatch.ElapsedTicks;
 
             ILogger logger = null;
-            if (TraceLogger.Host != null)
+            if (TraceLogger.LoggerFactory != null)
             {
                 Type loggerType = typeof(ILogger<>);
                 loggerType = loggerType.MakeGenericType(new[] { t });
-                var host = TraceLogger.Host;
-                logger = host.Services.GetRequiredService(loggerType) as ILogger;
+                //var host = TraceLogger.Host;
+                //logger = host.Services.GetRequiredService(loggerType) as ILogger;
+                var loggerFactory = TraceLogger.LoggerFactory;
+                logger = loggerFactory.CreateLogger(loggerType);
             }
 
             var sec = new CodeSectionScope(logger, t, name, payload, TraceLogger.TraceSource, sourceLevel, logLevel, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber);
@@ -313,12 +325,14 @@ namespace Common
             var caller = CodeSectionScope.Current.Value;
 
             ILogger logger = null;
-            if (TraceLogger.Host != null)
+            if (TraceLogger.LoggerFactory != null)
             {
                 Type loggerType = typeof(ILogger<>);
                 loggerType = loggerType.MakeGenericType(new[] { type });
-                var host = TraceLogger.Host;
-                logger = host.Services.GetRequiredService(loggerType) as ILogger;
+                //var host = TraceLogger.Host;
+                //logger = host.Services.GetRequiredService(loggerType) as ILogger;
+                var loggerFactory = TraceLogger.LoggerFactory;
+                logger = loggerFactory.CreateLogger(loggerType);
             }
 
             var innerCodeSection = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSectionScope(logger, type, null, null, null, SourceLevels.Verbose, LogLevel.Trace, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
@@ -333,12 +347,14 @@ namespace Common
             var caller = CodeSectionScope.Current.Value;
 
             ILogger logger = null;
-            if (TraceLogger.Host != null)
+            if (TraceLogger.LoggerFactory != null)
             {
                 Type loggerType = typeof(ILogger<>);
                 loggerType = loggerType.MakeGenericType(new[] { type });
-                var host = TraceLogger.Host;
-                logger = host.Services.GetRequiredService(loggerType) as ILogger;
+                //var host = TraceLogger.Host;
+                //logger = host.Services.GetRequiredService(loggerType) as ILogger;
+                var loggerFactory = TraceLogger.LoggerFactory;
+                logger = loggerFactory.CreateLogger(loggerType);
             }
 
             var innerCodeSection = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSectionScope(logger, type, null, null, null, SourceLevels.Verbose, LogLevel.Trace, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
@@ -352,12 +368,14 @@ namespace Common
             var caller = CodeSectionScope.Current.Value;
 
             ILogger logger = null;
-            if (TraceLogger.Host != null)
+            if (TraceLogger.LoggerFactory != null)
             {
                 Type loggerType = typeof(ILogger<>);
                 loggerType = loggerType.MakeGenericType(new[] { type });
-                var host = TraceLogger.Host;
-                logger = host.Services.GetRequiredService(loggerType) as ILogger;
+                //var host = TraceLogger.Host;
+                //logger = host.Services.GetRequiredService(loggerType) as ILogger;
+                var loggerFactory = TraceLogger.LoggerFactory;
+                logger = loggerFactory.CreateLogger(loggerType);
             }
 
             var innerCodeSection = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSectionScope(logger, type, null, null, null, SourceLevels.Verbose, LogLevel.Trace, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
@@ -371,12 +389,14 @@ namespace Common
             var caller = CodeSectionScope.Current.Value;
 
             ILogger logger = null;
-            if (TraceLogger.Host != null)
+            if (TraceLogger.LoggerFactory != null)
             {
                 Type loggerType = typeof(ILogger<>);
                 loggerType = loggerType.MakeGenericType(new[] { type });
-                var host = TraceLogger.Host;
-                logger = host.Services.GetRequiredService(loggerType) as ILogger;
+                //var host = TraceLogger.Host;
+                //logger = host.Services.GetRequiredService(loggerType) as ILogger;
+                var loggerFactory = TraceLogger.LoggerFactory;
+                logger = loggerFactory.CreateLogger(loggerType);
             }
 
             var innerCodeSection = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSectionScope(logger, type, null, null, null, SourceLevels.Verbose, LogLevel.Debug, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
@@ -391,12 +411,14 @@ namespace Common
             var caller = CodeSectionScope.Current.Value;
 
             ILogger logger = null;
-            if (TraceLogger.Host != null)
+            if (TraceLogger.LoggerFactory != null)
             {
                 Type loggerType = typeof(ILogger<>);
                 loggerType = loggerType.MakeGenericType(new[] { type });
-                var host = TraceLogger.Host;
-                logger = host.Services.GetRequiredService(loggerType) as ILogger;
+                //var host = TraceLogger.Host;
+                //logger = host.Services.GetRequiredService(loggerType) as ILogger;
+                var loggerFactory = TraceLogger.LoggerFactory;
+                logger = loggerFactory.CreateLogger(loggerType);
             }
 
             var innerCodeSection = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSectionScope(logger, type, null, null, null, SourceLevels.Verbose, LogLevel.Debug, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
@@ -410,12 +432,14 @@ namespace Common
             var caller = CodeSectionScope.Current.Value;
 
             ILogger logger = null;
-            if (TraceLogger.Host != null)
+            if (TraceLogger.LoggerFactory != null)
             {
                 Type loggerType = typeof(ILogger<>);
                 loggerType = loggerType.MakeGenericType(new[] { type });
-                var host = TraceLogger.Host;
-                logger = host.Services.GetRequiredService(loggerType) as ILogger;
+                //var host = TraceLogger.Host;
+                //logger = host.Services.GetRequiredService(loggerType) as ILogger;
+                var loggerFactory = TraceLogger.LoggerFactory;
+                logger = loggerFactory.CreateLogger(loggerType);
             }
 
             var innerCodeSection = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSectionScope(logger, type, null, null, null, SourceLevels.Verbose, LogLevel.Debug, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
@@ -429,12 +453,14 @@ namespace Common
             var caller = CodeSectionScope.Current.Value;
 
             ILogger logger = null;
-            if (TraceLogger.Host != null)
+            if (TraceLogger.LoggerFactory != null)
             {
                 Type loggerType = typeof(ILogger<>);
                 loggerType = loggerType.MakeGenericType(new[] { type });
-                var host = TraceLogger.Host;
-                logger = host.Services.GetRequiredService(loggerType) as ILogger;
+                //var host = TraceLogger.Host;
+                //logger = host.Services.GetRequiredService(loggerType) as ILogger;
+                var loggerFactory = TraceLogger.LoggerFactory;
+                logger = loggerFactory.CreateLogger(loggerType);
             }
 
             var innerCodeSection = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSectionScope(logger, type, null, null, null, SourceLevels.Verbose, LogLevel.Information, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
@@ -449,12 +475,14 @@ namespace Common
             var caller = CodeSectionScope.Current.Value;
 
             ILogger logger = null;
-            if (TraceLogger.Host != null)
+            if (TraceLogger.LoggerFactory != null)
             {
                 Type loggerType = typeof(ILogger<>);
                 loggerType = loggerType.MakeGenericType(new[] { type });
-                var host = TraceLogger.Host;
-                logger = host.Services.GetRequiredService(loggerType) as ILogger;
+                //var host = TraceLogger.Host;
+                //logger = host.Services.GetRequiredService(loggerType) as ILogger;
+                var loggerFactory = TraceLogger.LoggerFactory;
+                logger = loggerFactory.CreateLogger(loggerType);
             }
 
             var innerCodeSection = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSectionScope(logger, type, null, null, null, SourceLevels.Verbose, LogLevel.Information, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
@@ -468,12 +496,14 @@ namespace Common
             var caller = CodeSectionScope.Current.Value;
 
             ILogger logger = null;
-            if (TraceLogger.Host != null)
+            if (TraceLogger.LoggerFactory != null)
             {
                 Type loggerType = typeof(ILogger<>);
                 loggerType = loggerType.MakeGenericType(new[] { type });
-                var host = TraceLogger.Host;
-                logger = host.Services.GetRequiredService(loggerType) as ILogger;
+                //var host = TraceLogger.Host;
+                //logger = host.Services.GetRequiredService(loggerType) as ILogger;
+                var loggerFactory = TraceLogger.LoggerFactory;
+                logger = loggerFactory.CreateLogger(loggerType);
             }
 
             var innerCodeSection = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSectionScope(logger, type, null, null, null, SourceLevels.Verbose, LogLevel.Information, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
@@ -487,12 +517,14 @@ namespace Common
             var caller = CodeSectionScope.Current.Value;
 
             ILogger logger = null;
-            if (TraceLogger.Host != null)
+            if (TraceLogger.LoggerFactory != null)
             {
                 Type loggerType = typeof(ILogger<>);
                 loggerType = loggerType.MakeGenericType(new[] { type });
-                var host = TraceLogger.Host;
-                logger = host.Services.GetRequiredService(loggerType) as ILogger;
+                //var host = TraceLogger.Host;
+                //logger = host.Services.GetRequiredService(loggerType) as ILogger;
+                var loggerFactory = TraceLogger.LoggerFactory;
+                logger = loggerFactory.CreateLogger(loggerType);
             }
 
             var innerCodeSection = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSectionScope(logger, type, null, null, null, SourceLevels.Verbose, LogLevel.Warning, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
@@ -507,12 +539,14 @@ namespace Common
             var caller = CodeSectionScope.Current.Value;
 
             ILogger logger = null;
-            if (TraceLogger.Host != null)
+            if (TraceLogger.LoggerFactory != null)
             {
                 Type loggerType = typeof(ILogger<>);
                 loggerType = loggerType.MakeGenericType(new[] { type });
-                var host = TraceLogger.Host;
-                logger = host.Services.GetRequiredService(loggerType) as ILogger;
+                //var host = TraceLogger.Host;
+                //logger = host.Services.GetRequiredService(loggerType) as ILogger;
+                var loggerFactory = TraceLogger.LoggerFactory;
+                logger = loggerFactory.CreateLogger(loggerType);
             }
 
             var innerCodeSection = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSectionScope(logger, type, null, null, null, SourceLevels.Verbose, LogLevel.Warning, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
@@ -526,12 +560,14 @@ namespace Common
             var caller = CodeSectionScope.Current.Value;
 
             ILogger logger = null;
-            if (TraceLogger.Host != null)
+            if (TraceLogger.LoggerFactory != null)
             {
                 Type loggerType = typeof(ILogger<>);
                 loggerType = loggerType.MakeGenericType(new[] { type });
-                var host = TraceLogger.Host;
-                logger = host.Services.GetRequiredService(loggerType) as ILogger;
+                //var host = TraceLogger.Host;
+                //logger = host.Services.GetRequiredService(loggerType) as ILogger;
+                var loggerFactory = TraceLogger.LoggerFactory;
+                logger = loggerFactory.CreateLogger(loggerType);
             }
 
             var innerCodeSection = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSectionScope(logger, type, null, null, null, SourceLevels.Verbose, LogLevel.Warning, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
@@ -545,12 +581,14 @@ namespace Common
             var caller = CodeSectionScope.Current.Value;
 
             ILogger logger = null;
-            if (TraceLogger.Host != null)
+            if (TraceLogger.LoggerFactory != null)
             {
                 Type loggerType = typeof(ILogger<>);
                 loggerType = loggerType.MakeGenericType(new[] { type });
-                var host = TraceLogger.Host;
-                logger = host.Services.GetRequiredService(loggerType) as ILogger;
+                //var host = TraceLogger.Host;
+                //logger = host.Services.GetRequiredService(loggerType) as ILogger;
+                var loggerFactory = TraceLogger.LoggerFactory;
+                logger = loggerFactory.CreateLogger(loggerType);
             }
 
             var innerCodeSection = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSectionScope(logger, type, null, null, null, SourceLevels.Verbose, LogLevel.Error, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
@@ -565,12 +603,14 @@ namespace Common
             var caller = CodeSectionScope.Current.Value;
 
             ILogger logger = null;
-            if (TraceLogger.Host != null)
+            if (TraceLogger.LoggerFactory != null)
             {
                 Type loggerType = typeof(ILogger<>);
                 loggerType = loggerType.MakeGenericType(new[] { type });
-                var host = TraceLogger.Host;
-                logger = host.Services.GetRequiredService(loggerType) as ILogger;
+                //var host = TraceLogger.Host;
+                //logger = host.Services.GetRequiredService(loggerType) as ILogger;
+                var loggerFactory = TraceLogger.LoggerFactory;
+                logger = loggerFactory.CreateLogger(loggerType);
             }
 
             var innerCodeSection = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSectionScope(logger, type, null, null, null, SourceLevels.Verbose, LogLevel.Error, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
@@ -584,12 +624,14 @@ namespace Common
             var caller = CodeSectionScope.Current.Value;
 
             ILogger logger = null;
-            if (TraceLogger.Host != null)
+            if (TraceLogger.LoggerFactory != null)
             {
                 Type loggerType = typeof(ILogger<>);
                 loggerType = loggerType.MakeGenericType(new[] { type });
-                var host = TraceLogger.Host;
-                logger = host.Services.GetRequiredService(loggerType) as ILogger;
+                //var host = TraceLogger.Host;
+                //logger = host.Services.GetRequiredService(loggerType) as ILogger;
+                var loggerFactory = TraceLogger.LoggerFactory;
+                logger = loggerFactory.CreateLogger(loggerType);
             }
 
             var innerCodeSection = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSectionScope(logger, type, null, null, null, SourceLevels.Verbose, LogLevel.Error, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
@@ -603,12 +645,14 @@ namespace Common
             var caller = CodeSectionScope.Current.Value;
 
             ILogger logger = null;
-            if (TraceLogger.Host != null)
+            if (TraceLogger.LoggerFactory != null)
             {
                 Type loggerType = typeof(ILogger<>);
                 loggerType = loggerType.MakeGenericType(new[] { type });
-                var host = TraceLogger.Host;
-                logger = host.Services.GetRequiredService(loggerType) as ILogger;
+                //var host = TraceLogger.Host;
+                //logger = host.Services.GetRequiredService(loggerType) as ILogger;
+                var loggerFactory = TraceLogger.LoggerFactory;
+                logger = loggerFactory.CreateLogger(loggerType);
             }
 
             var innerCodeSection = caller != null ? caller = caller.GetInnerSection() : caller = new CodeSectionScope(logger, type, null, null, null, SourceLevels.Verbose, LogLevel.Error, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber, true);
@@ -663,10 +707,12 @@ namespace Common
         {
             var startTicks = TraceLogger.Stopwatch.ElapsedTicks;
 
-            if (logger == null && TraceLogger.Host != null)
+            if (logger == null && TraceLogger.LoggerFactory != null)
             {
-                var host = TraceLogger.Host;
-                logger = host.Services.GetRequiredService<ILogger<T>>();
+                //var host = TraceLogger.Host;
+                //logger = host.Services.GetRequiredService<ILogger<T>>();
+                var loggerFactory = TraceLogger.LoggerFactory;
+                logger = loggerFactory.CreateLogger<T>();
             }
 
             var sec = new CodeSectionScope(logger, typeof(T), null, payload, TraceLogger.TraceSource, sourceLevel, logLevel, category, properties, source, startTicks, memberName, sourceFilePath, sourceLineNumber);
@@ -714,7 +760,9 @@ namespace Common
             if (host == null) return null;
 
             TraceLogger.Host = host;
-            var logger = host.Services.GetRequiredService<ILogger<T>>();
+            TraceLogger.LoggerFactory = host.Services.GetRequiredService<ILoggerFactory>();
+            //var logger = host.Services.GetRequiredService<ILogger<T>>();
+            var logger = TraceLogger.LoggerFactory.CreateLogger<T>();
             return logger;
         }
         public static void InitTraceLogger(this IHost Host)
@@ -724,6 +772,7 @@ namespace Common
             using (new SwitchOnDispose(TraceLogger._isInitializeComplete, false))
             {
                 TraceLogger.Host = Host;
+                TraceLogger.LoggerFactory = Host.Services.GetRequiredService<ILoggerFactory>();
             }
             return;
         }

@@ -65,7 +65,7 @@ namespace EasySample
 
                 var appInsightKey = ConfigurationHelper.GetClassSetting<App, string>(CONFIGVALUE_APPINSIGHTSKEY, DEFAULTVALUE_APPINSIGHTSKEY); // , CultureInfo.InvariantCulture
 
-                Host = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder()
+                Host = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder() 
                         .ConfigureAppConfiguration(builder =>
                         {
                             builder.Sources.Clear();
