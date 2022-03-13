@@ -645,6 +645,7 @@ namespace Common
                 {
                     return (operationContext?.RequestContext?.RequestId, operationContext?.RequestContext != null ? operationContext.RequestContext.RequestDept : 0);
                 }
+                if (string.IsNullOrEmpty(operationID)) { operationID = Guid.NewGuid().ToString(); }
             }
             catch (Exception ex) { operationID = ex.Message; }
             return (operationID, 0);
