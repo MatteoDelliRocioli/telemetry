@@ -41,7 +41,7 @@ namespace Common
         public static TraceSource TraceSource { get; set; }
         public static Stopwatch Stopwatch = TraceManager.Stopwatch;
         public static IHost Host { get; set; }
-        //public static ILoggerFactory LoggerFactory { get; set; }
+        // public static ILoggerFactory LoggerFactory { get; set; }
         internal static Process CurrentProcess { get; set; }
         internal static SafeProcessHandle CurrentProcessSafeProcessHandle { get; set; }
         internal static Assembly EntryAssembly { get; set; }
