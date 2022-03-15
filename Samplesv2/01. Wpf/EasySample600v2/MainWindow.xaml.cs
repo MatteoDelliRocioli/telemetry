@@ -89,7 +89,8 @@ namespace EasySample
 
         private void btnRun_Click(object sender, RoutedEventArgs e)
         {
-            using var scope = _logger.BeginMethodScope(new { sender = sender.GetLogString(), e = e.GetLogString() });
+            // _logger.PushOperationId();
+            using var scope = _logger.BeginMethodScope(new { sender = sender.GetLogString(), e = e.GetLogString() }, SourceLevels.Verbose, LogLevel.Debug, null, new Dictionary<string, object>() { { "OperationId", Guid.NewGuid().ToString() } });
 
             try
             {

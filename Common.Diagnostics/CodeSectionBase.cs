@@ -26,6 +26,7 @@ namespace Common
         #endregion
 
         public bool _isLogEnabled { get; set; } = true;
+        public bool _overrideOperationIdEnabled { get; set; } = true;
         public bool? _showNestedFlow { get; set; }
         public int? _maxMessageLevel { get; set; }
         public int? _maxMessageLen { get; set; }

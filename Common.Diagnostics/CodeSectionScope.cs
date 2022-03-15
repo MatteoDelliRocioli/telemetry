@@ -89,22 +89,33 @@ namespace Common
             if (Caller != null)
             {
                 if (disableStartEndTraces == false) { NestingLevel = Caller.NestingLevel + 1; } // NestingLevel
-                OperationID = Caller.OperationID; // OperationID
+                var operationId = Caller.OperationID;
+                if (_overrideOperationIdEnabled)
+                {
+                    var operationIdOverride = properties != null && properties.ContainsKey("OperationId") ? properties["OperationId"] as string : null;
+                    if (operationIdOverride != null) { operationId = operationIdOverride; }
+                }
+                OperationID = operationId; 
                 OperationDept = Caller.OperationDept; // OperationDept
                 if (string.IsNullOrEmpty(OperationID)) { (this.OperationID, this.OperationDept) = getOperationInfo(); }
             }
             else
             {
-                (string operationID, int operationDept) = getOperationInfo();
+                (string operationId, int operationDept) = getOperationInfo();
                 NestingLevel = 0;
-                OperationID = operationID;
+                if (_overrideOperationIdEnabled)
+                {
+                    var operationIdOverride = properties != null && properties.ContainsKey("OperationId") ? properties["OperationId"] as string : null;
+                    if (operationIdOverride != null) { operationId = operationIdOverride; }
+                }
+                OperationID = operationId;
                 OperationDept = operationDept;
             }
 
             if (this.DisableStartEndTraces == true) { return; }
 
             var entry = new TraceEntry() { TraceEventType = TraceEventType.Start, LogLevel = logLevel, TraceSource = this.TraceSource, Message = null, Properties = properties, Source = source, Category = category, SourceLevel = sourceLevel, CodeSectionBase = this, Thread = Thread.CurrentThread, ThreadID = Thread.CurrentThread.ManagedThreadId, ApartmentState = Thread.CurrentThread.GetApartmentState(), ElapsedMilliseconds = TraceLogger.Stopwatch.ElapsedMilliseconds, TraceStartTicks = startTicks };
-            if (!TraceLogger._lockListenersNotifications.Value) 
+            if (!TraceLogger._lockListenersNotifications.Value)
             {
                 if (_logger == null) { _logger = GetEntrylogger(ref entry); }
 
@@ -158,18 +169,30 @@ namespace Common
 
             if (disableStartEndTraces == false) { CodeSectionBase.Current.Value = this; }
 
+            // if _overrideOperationId properties
             if (Caller != null)
             {
                 if (disableStartEndTraces == false) { NestingLevel = Caller.NestingLevel + 1; }
-                OperationID = Caller.OperationID;
+                var operationId = Caller.OperationID;
+                if (_overrideOperationIdEnabled)
+                {
+                    var operationIdOverride = properties != null && properties.ContainsKey("OperationId") ? properties["OperationId"] as string : null;
+                    if (operationIdOverride != null) { operationId = operationIdOverride; }
+                }
+                OperationID = operationId; 
                 OperationDept = Caller.OperationDept;
                 if (string.IsNullOrEmpty(OperationID)) { (this.OperationID, this.OperationDept) = getOperationInfo(); }
             }
             else
             {
-                (string operationID, int operationDept) = getOperationInfo();
+                (string operationId, int operationDept) = getOperationInfo();
                 NestingLevel = 0;
-                OperationID = operationID;
+                if (_overrideOperationIdEnabled)
+                {
+                    var operationIdOverride = properties != null && properties.ContainsKey("OperationId") ? properties["OperationId"] as string : null;
+                    if (operationIdOverride != null) { operationId = operationIdOverride; }
+                }
+                OperationID = operationId; // overrideOperationId && opId!=null? opId: operationID; 
                 OperationDept = operationDept;
             }
             //this.ModuleContext = this.Assembly != null ? LoggerFormatter.GetModuleContext(this.Assembly) : null;
@@ -177,7 +200,7 @@ namespace Common
             if (this.DisableStartEndTraces == true) { return; }
 
             var entry = new TraceEntry() { TraceEventType = TraceEventType.Start, TraceSource = this.TraceSource, SourceLevel = sourceLevel, LogLevel = logLevel, Message = null, Properties = properties, Source = source, Category = category, CodeSectionBase = this, Thread = Thread.CurrentThread, ThreadID = Thread.CurrentThread.ManagedThreadId, ApartmentState = Thread.CurrentThread.GetApartmentState(), ElapsedMilliseconds = TraceLogger.Stopwatch.ElapsedMilliseconds, TraceStartTicks = startTicks };
-            if (!TraceLogger._lockListenersNotifications.Value) 
+            if (!TraceLogger._lockListenersNotifications.Value)
             {
                 if (_logger == null) { _logger = GetEntrylogger(ref entry); }
 
@@ -198,7 +221,7 @@ namespace Common
             var message = obj.GetLogString();
 
             var entry = new TraceEntry() { Message = message, TraceEventType = TraceEventType.Verbose, SourceLevel = SourceLevels.Verbose, LogLevel = LogLevel.Trace, Properties = properties, Source = source ?? this.Source, Category = category, CodeSectionBase = this, Thread = Thread.CurrentThread, ThreadID = Thread.CurrentThread.ManagedThreadId, ApartmentState = Thread.CurrentThread.GetApartmentState(), DisableCRLFReplace = disableCRLFReplace, ElapsedMilliseconds = TraceLogger.Stopwatch.ElapsedMilliseconds, TraceStartTicks = startTicks };
-            if (!TraceLogger._lockListenersNotifications.Value) 
+            if (!TraceLogger._lockListenersNotifications.Value)
             {
                 if (_logger == null) { _logger = GetEntrylogger(ref entry); }
 
@@ -215,7 +238,7 @@ namespace Common
             var startTicks = TraceLogger.Stopwatch.ElapsedTicks;
 
             var entry = new TraceEntry() { Message = message.Value, TraceEventType = TraceEventType.Verbose, SourceLevel = SourceLevels.Verbose, LogLevel = LogLevel.Trace, Properties = properties, Source = source ?? this.Source, Category = category, CodeSectionBase = this, Thread = Thread.CurrentThread, ThreadID = Thread.CurrentThread.ManagedThreadId, ApartmentState = Thread.CurrentThread.GetApartmentState(), DisableCRLFReplace = disableCRLFReplace, ElapsedMilliseconds = TraceLogger.Stopwatch.ElapsedMilliseconds, TraceStartTicks = startTicks };
-            if (!TraceLogger._lockListenersNotifications.Value) 
+            if (!TraceLogger._lockListenersNotifications.Value)
             {
                 if (_logger == null) { _logger = GetEntrylogger(ref entry); }
 
@@ -250,7 +273,7 @@ namespace Common
                     ElapsedMilliseconds = TraceLogger.Stopwatch.ElapsedMilliseconds,
                     TraceStartTicks = startTicks
                 };
-                if (!TraceLogger._lockListenersNotifications.Value) 
+                if (!TraceLogger._lockListenersNotifications.Value)
                 {
                     if (_logger == null) { _logger = GetEntrylogger(ref entry); }
 
@@ -272,7 +295,7 @@ namespace Common
             try
             {
                 var entry = new TraceEntry() { GetMessage = getMessage, TraceEventType = TraceEventType.Verbose, SourceLevel = SourceLevels.Verbose, LogLevel = LogLevel.Trace, Properties = properties, Source = source ?? this.Source, Category = category, CodeSectionBase = this, Thread = Thread.CurrentThread, ThreadID = Thread.CurrentThread.ManagedThreadId, ApartmentState = Thread.CurrentThread.GetApartmentState(), DisableCRLFReplace = disableCRLFReplace, ElapsedMilliseconds = TraceLogger.Stopwatch.ElapsedMilliseconds, TraceStartTicks = startTicks };
-                if (!TraceLogger._lockListenersNotifications.Value) 
+                if (!TraceLogger._lockListenersNotifications.Value)
                 {
                     if (_logger == null) { _logger = GetEntrylogger(ref entry); }
 
@@ -294,7 +317,7 @@ namespace Common
             var message = obj.GetLogString();
 
             var entry = new TraceEntry() { Message = message, TraceEventType = TraceEventType.Verbose, SourceLevel = SourceLevels.Verbose, LogLevel = LogLevel.Debug, Properties = properties, Source = source ?? this.Source, Category = category, CodeSectionBase = this, Thread = Thread.CurrentThread, ThreadID = Thread.CurrentThread.ManagedThreadId, ApartmentState = Thread.CurrentThread.GetApartmentState(), DisableCRLFReplace = disableCRLFReplace, ElapsedMilliseconds = TraceLogger.Stopwatch.ElapsedMilliseconds, TraceStartTicks = startTicks };
-            if (!TraceLogger._lockListenersNotifications.Value) 
+            if (!TraceLogger._lockListenersNotifications.Value)
             {
                 if (_logger == null) { _logger = GetEntrylogger(ref entry); }
 
@@ -443,7 +466,7 @@ namespace Common
             var startTicks = TraceLogger.Stopwatch.ElapsedTicks;
 
             var entry = new TraceEntry() { Message = message.Value, TraceEventType = TraceEventType.Warning, SourceLevel = SourceLevels.Warning, LogLevel = LogLevel.Warning, TraceSource = this.TraceSource, Properties = properties, Source = source ?? this.Source, Category = category, CodeSectionBase = this, Thread = Thread.CurrentThread, ThreadID = Thread.CurrentThread.ManagedThreadId, ApartmentState = Thread.CurrentThread.GetApartmentState(), DisableCRLFReplace = disableCRLFReplace, ElapsedMilliseconds = TraceLogger.Stopwatch.ElapsedMilliseconds, TraceStartTicks = startTicks };
-            if (!TraceLogger._lockListenersNotifications.Value )
+            if (!TraceLogger._lockListenersNotifications.Value)
             {
                 if (_logger == null) { _logger = GetEntrylogger(ref entry); }
 
@@ -461,7 +484,7 @@ namespace Common
             var startTicks = TraceLogger.Stopwatch.ElapsedTicks;
 
             var entry = new TraceEntry() { Message = string.Format(message.Format, message.GetArguments()), TraceEventType = TraceEventType.Warning, SourceLevel = SourceLevels.Warning, LogLevel = LogLevel.Warning, TraceSource = this.TraceSource, Properties = properties, Source = source ?? this.Source, Category = category, CodeSectionBase = this, Thread = Thread.CurrentThread, ThreadID = Thread.CurrentThread.ManagedThreadId, ApartmentState = Thread.CurrentThread.GetApartmentState(), DisableCRLFReplace = disableCRLFReplace, ElapsedMilliseconds = TraceLogger.Stopwatch.ElapsedMilliseconds, TraceStartTicks = startTicks };
-            if (!TraceLogger._lockListenersNotifications.Value )
+            if (!TraceLogger._lockListenersNotifications.Value)
             {
                 if (_logger == null) { _logger = GetEntrylogger(ref entry); }
 
@@ -480,7 +503,7 @@ namespace Common
             try
             {
                 var entry = new TraceEntry() { GetMessage = getMessage, TraceEventType = TraceEventType.Warning, SourceLevel = SourceLevels.Warning, LogLevel = LogLevel.Warning, Properties = properties, Source = source ?? this.Source, Category = category, CodeSectionBase = this, Thread = Thread.CurrentThread, ThreadID = Thread.CurrentThread.ManagedThreadId, ApartmentState = Thread.CurrentThread.GetApartmentState(), DisableCRLFReplace = disableCRLFReplace, ElapsedMilliseconds = TraceLogger.Stopwatch.ElapsedMilliseconds, TraceStartTicks = startTicks };
-                if (!TraceLogger._lockListenersNotifications.Value )
+                if (!TraceLogger._lockListenersNotifications.Value)
                 {
                     if (_logger == null) { _logger = GetEntrylogger(ref entry); }
 
@@ -500,7 +523,7 @@ namespace Common
             var startTicks = TraceLogger.Stopwatch.ElapsedTicks;
 
             var entry = new TraceEntry() { Message = message.Value, TraceEventType = TraceEventType.Error, SourceLevel = SourceLevels.Error, LogLevel = LogLevel.Error, TraceSource = this.TraceSource, Properties = properties, Source = source ?? this.Source, Category = category, CodeSectionBase = this, Thread = Thread.CurrentThread, ThreadID = Thread.CurrentThread.ManagedThreadId, ApartmentState = Thread.CurrentThread.GetApartmentState(), DisableCRLFReplace = disableCRLFReplace, ElapsedMilliseconds = TraceLogger.Stopwatch.ElapsedMilliseconds, TraceStartTicks = startTicks };
-            if (!TraceLogger._lockListenersNotifications.Value )
+            if (!TraceLogger._lockListenersNotifications.Value)
             {
                 if (_logger == null) { _logger = GetEntrylogger(ref entry); }
 
@@ -598,7 +621,7 @@ namespace Common
             try
             {
                 if (this.DisableStartEndTraces == true) { return; }
-                if (!TraceLogger._lockListenersNotifications.Value )
+                if (!TraceLogger._lockListenersNotifications.Value)
                 {
                     var entry = new TraceEntry() { TraceEventType = TraceEventType.Stop, LogLevel = this.LogLevel, TraceSource = this.TraceSource, Message = null, Properties = this.Properties, Source = this.Source, Category = this.Category, SourceLevel = this.SourceLevel, CodeSectionBase = this, Thread = Thread.CurrentThread, ThreadID = Thread.CurrentThread.ManagedThreadId, ApartmentState = Thread.CurrentThread.GetApartmentState(), ElapsedMilliseconds = TraceLogger.Stopwatch.ElapsedMilliseconds, TraceStartTicks = startTicks };
                     if (_logger == null) { _logger = GetEntrylogger(ref entry); }
@@ -631,7 +654,7 @@ namespace Common
             //var logger = loggerFactory.CreateLogger(loggerType);
 
             return logger;
-        } 
+        }
         #endregion
         #region getOperationInfo
         public static (string, int) getOperationInfo()
