@@ -229,7 +229,7 @@ namespace Common
         }
         private static string ToLogStringInternal(this byte pbyte)
         {
-            string logString = $"0x{pbyte:{{0:X2}}}";
+            string logString = $"0x{pbyte.ToString("X2")}";
             return logString;
         }
         private static string ToLogStringInternal(this CultureInfo pthis)
